@@ -1,10 +1,10 @@
 package es.uji.ei1027.clubesportiu.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Seleccion {
     private int idSeleccion;
-    private Date fechaSeleccion;
+    private LocalDate fechaSeleccion;
     private Estado estado;
 
     public Seleccion() {
@@ -18,11 +18,11 @@ public class Seleccion {
         this.idSeleccion = idSeleccion;
     }
 
-    public Date getFechaSeleccion() {
+    public LocalDate getFechaSeleccion() {
         return fechaSeleccion;
     }
 
-    public void setFechaSeleccion(Date fechaSeleccion) {
+    public void setFechaSeleccion(LocalDate fechaSeleccion) {
         this.fechaSeleccion = fechaSeleccion;
     }
 

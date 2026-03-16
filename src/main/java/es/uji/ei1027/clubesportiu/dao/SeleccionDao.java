@@ -1,8 +1,10 @@
 package es.uji.ei1027.clubesportiu.dao;
 
+import es.uji.ei1027.clubesportiu.model.Estado;
 import es.uji.ei1027.clubesportiu.model.Seleccion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -23,48 +25,41 @@ public class SeleccionDao {
     }
 
     public void addSeleccion(Seleccion seleccion) {
-        int athleteIdentificator = athlete.getId();
-        String nameAndSurnames = athlete.getNameAndSurnames();
-        LocalDate dateOfBirth = Date.valueOf(athlete.getDateOfBirth()).toLocalDate();
-        String email = athlete.getEmail();
+        int idSeleccion = seleccion.getIdSeleccion();
+        LocalDate fechaSeleccion = seleccion.getFechaSeleccion();
+        Estado estado = seleccion.getEstado();
 
         jdbcTemplate.update(
-                "INSERT INTO athlete VALUES(?, ?, ?, ?)",
-                athleteIdentificator, nameAndSurnames, dateOfBirth, email);
+                "INSERT INTO seleccion VALUES(?, ?, ?)",
+                idSeleccion, fechaSeleccion, estado.name());
     }
 
-    public void deleteAthlete(int athleteIdentificator) {
-        jdbcTemplate.update("DELETE FROM athlete WHERE athleteIdentificator =?", athleteIdentificator);
+    public void deleteSeleccion(int idSeleccion) {
+        jdbcTemplate.update("DELETE FROM seleccion WHERE idSeleccion =?", idSeleccion);
     }
 
-    public void updateAthlete(Athlete athlete) {
-        int athleteIdentificator = athlete.getId();
-        String nameAndSurnames = athlete.getNameAndSurnames();
-        LocalDate dateOfBirth = Date.valueOf(athlete.getDateOfBirth()).toLocalDate();
-        String email = athlete.getEmail();
+    public void updateSeleccion(Seleccion seleccion) {
+        int idSeleccion = seleccion.getIdSeleccion();
+        LocalDate fechaSeleccion = seleccion.getFechaSeleccion();
+        Estado estado = seleccion.getEstado();
 
-        jdbcTemplate.update("UPDATE athlete SET nameAndSurnames =?, dateOfBirth=?, email=? WHERE athleteIdentificator =?",
-                nameAndSurnames, dateOfBirth, email, athleteIdentificator);
+        jdbcTemplate.update("UPDATE seleccion SET fechaSeleccion=?, estado=? WHERE idSeleccion=?",
+                fechaSeleccion, estado.name(), idSeleccion);
     }
 
-    public Athlete getAthlete(int athleteIdentificator) {
+    public Seleccion getSeleccion(int idSeleccion) {
         try {
             return jdbcTemplate.queryForObject(
-                    "SELECT * FROM athlete WHERE athleteIdentificator =?",
-                    new AthleteRowMapper(),
-                    athleteIdentificator);
+                    "SELECT * FROM seleccion WHERE idSeleccion =?",
+                    new BeanPropertyRowMapper<>(Seleccion.class),
+                    idSeleccion);
         }
         catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
-    public List<Athlete> getAthletes() {
-        try {
-            return jdbcTemplate.query("SELECT * FROM athlete", new AthleteRowMapper());
-        }
-        catch (EmptyResultDataAccessException e) {
-            return new ArrayList<Athlete>();
-        }
+    public List<Seleccion> getSelecciones() {
+        return jdbcTemplate.query("SELECT * FROM seleccion", new BeanPropertyRowMapper<>(Seleccion.class));
     }
 }
