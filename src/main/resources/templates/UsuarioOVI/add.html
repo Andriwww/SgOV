@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>Añadir Usuario OVI</title>
+</head>
+<body>
+
+<h1>Añadir Usuario OVI</h1>
+
+<form th:action="@{/UsuarioOVI/add}" th:object="${usuario}" method="post">
+    <table style="border-collapse: collapse">
+        <tr>
+            <td>ID Usuario:</td>
+            <td><input type="number" th:field="*{idUsuario}" required/></td>
+        </tr>
+        <tr>
+            <td>Nombre:</td>
+            <td><input type="text" th:field="*{nombre}" required/></td>
+        </tr>
+        <tr>
+            <td>Apellidos:</td>
+            <td><input type="text" th:field="*{apellidos}" required/></td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td><input type="email" th:field="*{email}" required/></td>
+        </tr>
+        <tr>
+            <td>Teléfono:</td>
+            <td><input type="text" th:field="*{telefono}"/></td>
+        </tr>
+        <tr>
+            <td>Dirección:</td>
+            <td><input type="text" th:field="*{direccion}"/></td>
+        </tr>
+        <tr>
+            <td>Consentimiento RGBD:</td>
+            <td><input type="checkbox" th:field="*{consentimientoRGBD}"/></td>
+        </tr>
+        <tr>
+            <td>Estado Aceptado:</td>
+            <td><input type="checkbox" th:field="*{estadoAceptado}"/></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button type="submit">Guardar</button>
+                <a href="/SgOV/templates/UsuarioOVI/list.html" th:href="@{/SgOV/templates/UsuarioOVI/list}">Cancelar</a>
+            </td>
+        </tr>
+    </table>
+</form>
+
+</body>
+</html>

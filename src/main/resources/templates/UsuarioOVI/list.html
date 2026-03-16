@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>Usuarios OVI</title>
+</head>
+<body>
+
+<h1>Listado de Usuarios OVI</h1>
+
+<a href="add">Añadir</a>
+
+<br/><br/>
+
+<table style="border-collapse: collapse">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellidos</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Dirección</th>
+        <th>RGBD</th>
+        <th>Aceptado</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="usuario : ${usuarios}">
+        <td th:text="${usuario.idUsuario}"></td>
+        <td th:text="${usuario.nombre}"></td>
+        <td th:text="${usuario.apellidos}"></td>
+        <td th:text="${usuario.email}"></td>
+        <td th:text="${usuario.telefono}"></td>
+        <td th:text="${usuario.direccion}"></td>
+        <td th:text="${usuario.consentimientoRGBD} ? 'Sí' : 'No'"></td>
+        <td th:text="${usuario.estadoAceptado} ? 'Sí' : 'No'"></td>
+        <td>
+            <a href="/SgOV/templates/UsuarioOVI/update.html" th:href="@{/SgOV/templates/UsuarioOVI/update}">Editar</a>
+            |
+            <a href="/SgOV/templates/UsuarioOVI/delete.html" th:href="@{/SgOV/templates/UsuarioOVI/delete}">Eliminar</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
