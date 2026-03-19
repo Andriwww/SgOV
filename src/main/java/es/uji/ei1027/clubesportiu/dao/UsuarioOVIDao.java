@@ -22,9 +22,8 @@ public class UsuarioOVIDao {
 
     public void addUsuarioOVI(UsuarioOVI usuario) {
         jdbcTemplate.update(
-                "INSERT INTO usuarioOVI (idUsuario, nombre, apellidos, email, telefono, direccion, consentimientoRGBD, estadoAceptado) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                usuario.getIdUsuario(),
+                "INSERT INTO usuarioovi (nombre, apellidos, email, telefono, direccion, consentimientorgbd, estadoaceptado) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 usuario.getNombre(),
                 usuario.getApellidos(),
                 usuario.getEmail(),
@@ -35,13 +34,13 @@ public class UsuarioOVIDao {
     }
 
     public void deleteUsuarioOVI(int idUsuario) {
-        jdbcTemplate.update("DELETE FROM usuarioOVI WHERE idUsuario = ?", idUsuario);
+        jdbcTemplate.update("DELETE FROM usuarioovi WHERE idusuario = ?", idUsuario);
     }
 
     public void updateUsuarioOVI(UsuarioOVI usuario) {
         jdbcTemplate.update(
-                "UPDATE usuarioOVI SET nombre=?, apellidos=?, email=?, telefono=?, direccion=?, consentimientoRGBD=?, estadoAceptado=? " +
-                        "WHERE idUsuario=?",
+                "UPDATE usuarioovi SET nombre=?, apellidos=?, email=?, telefono=?, direccion=?, consentimientorgbd=?, estadoaceptado=? " +
+                        "WHERE idusuario=?",
                 usuario.getNombre(),
                 usuario.getApellidos(),
                 usuario.getEmail(),
@@ -55,8 +54,8 @@ public class UsuarioOVIDao {
     public UsuarioOVI getUsuarioOVI(int idUsuario) {
         try {
             return jdbcTemplate.queryForObject(
-                    "SELECT * FROM usuarioOVI WHERE idUsuario = ?",
-                    new BeanPropertyRowMapper<>(UsuarioOVI.class),
+                    "SELECT * FROM usuarioovi WHERE idusuario = ?",
+                    new UsuarioOVIRowMapper(),
                     idUsuario);
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -65,7 +64,7 @@ public class UsuarioOVIDao {
 
     public List<UsuarioOVI> getUsuariosOVI() {
         return jdbcTemplate.query(
-                "SELECT * FROM usuarioOVI",
-                new BeanPropertyRowMapper<>(UsuarioOVI.class));
+                "SELECT * FROM usuarioovi",
+                new UsuarioOVIRowMapper());
     }
 }

@@ -39,7 +39,7 @@ public class UsuarioOVIController {
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable int id, Model model) {
         model.addAttribute("usuario", usuarioOVIDao.getUsuarioOVI(id));
-        return "UsuarioOVI/update";
+        return "UsuarioOVI/edit";
     }
 
     @PostMapping("/edit")
