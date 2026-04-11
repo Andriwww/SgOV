@@ -6,7 +6,6 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -63,7 +62,7 @@ public class AsistenciaFormacionDao {
         try {
             return jdbcTemplate.queryForObject(
                     "SELECT * FROM AsistenciaFormacion WHERE idAsistencia=?",
-                    new BeanPropertyRowMapper<>(AsistenciaFormacion.class),
+                    new AsistenciaFormacionRowMapper(),
                     idAsistencia
             );
         } catch (EmptyResultDataAccessException e) {
@@ -75,7 +74,7 @@ public class AsistenciaFormacionDao {
     public List<AsistenciaFormacion> getAsistenciasFormacion() {
         return jdbcTemplate.query(
                 "SELECT * FROM AsistenciaFormacion",
-                new BeanPropertyRowMapper<>(AsistenciaFormacion.class)
+                new AsistenciaFormacionRowMapper()
         );
     }
     
@@ -83,7 +82,7 @@ public class AsistenciaFormacionDao {
     public List<AsistenciaFormacion> getAsistenciasByActividad(int idActividad) {
         return jdbcTemplate.query(
                 "SELECT * FROM AsistenciaFormacion WHERE idActividad=?",
-                new BeanPropertyRowMapper<>(AsistenciaFormacion.class),
+                new AsistenciaFormacionRowMapper(),
                 idActividad
         );
     }

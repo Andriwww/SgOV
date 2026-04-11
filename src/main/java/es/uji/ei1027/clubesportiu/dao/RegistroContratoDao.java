@@ -63,7 +63,7 @@ public class RegistroContratoDao {
         try {
             return jdbcTemplate.queryForObject(
                     "SELECT * FROM RegistroContrato WHERE idContrato=?",
-                    new BeanPropertyRowMapper<>(RegistroContrato.class),
+                    new RegistroContratoRowMapper(),
                     idContrato
             );
         } catch (EmptyResultDataAccessException e) {
@@ -75,7 +75,7 @@ public class RegistroContratoDao {
     public List<RegistroContrato> getRegistroContratos() {
         return jdbcTemplate.query(
                 "SELECT * FROM RegistroContrato",
-                new BeanPropertyRowMapper<>(RegistroContrato.class)
+                new RegistroContratoRowMapper()
         );
     }
 
@@ -83,7 +83,7 @@ public class RegistroContratoDao {
     public List<RegistroContrato> getContratosByAsistente(int idAsistente) {
         return jdbcTemplate.query(
                 "SELECT * FROM RegistroContrato WHERE idAsistente=?",
-                new BeanPropertyRowMapper<>(RegistroContrato.class),
+                new RegistroContratoRowMapper(),
                 idAsistente
         );
     }

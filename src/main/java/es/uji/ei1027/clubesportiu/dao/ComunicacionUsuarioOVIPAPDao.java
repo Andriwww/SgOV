@@ -3,12 +3,10 @@ package es.uji.ei1027.clubesportiu.dao;
 import es.uji.ei1027.clubesportiu.model.ComunicacionUsuarioOVIPAP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -62,7 +60,7 @@ public class ComunicacionUsuarioOVIPAPDao {
         try {
             return jdbcTemplate.queryForObject(
                     "SELECT * FROM ComunicacionUsuarioOVIPAP WHERE idComunicacion=?",
-                    new BeanPropertyRowMapper<>(ComunicacionUsuarioOVIPAP.class),
+                    new ComunicacionUsuarioOVIPAPRowMapper(),
                     idComunicacion
             );
         } catch (EmptyResultDataAccessException e) {
@@ -74,7 +72,7 @@ public class ComunicacionUsuarioOVIPAPDao {
     public List<ComunicacionUsuarioOVIPAP> getComunicaciones() {
         return jdbcTemplate.query(
                 "SELECT * FROM ComunicacionUsuarioOVIPAP",
-                new BeanPropertyRowMapper<>(ComunicacionUsuarioOVIPAP.class)
+                new ComunicacionUsuarioOVIPAPRowMapper()
         );
     }
 
@@ -82,7 +80,7 @@ public class ComunicacionUsuarioOVIPAPDao {
     public List<ComunicacionUsuarioOVIPAP> getComunicacionesBySeleccion(int idSeleccion) {
         return jdbcTemplate.query(
                 "SELECT * FROM ComunicacionUsuarioOVIPAP WHERE idSeleccion=?",
-                new BeanPropertyRowMapper<>(ComunicacionUsuarioOVIPAP.class),
+                new ComunicacionUsuarioOVIPAPRowMapper(),
                 idSeleccion
         );
     }

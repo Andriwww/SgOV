@@ -3,7 +3,6 @@ package es.uji.ei1027.clubesportiu.dao;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -65,7 +64,7 @@ public class AsistentePersonalDao {
         try {
             return jdbcTemplate.queryForObject(
                     "SELECT * FROM AsistentePersonal WHERE idAsistente=?",
-                    new BeanPropertyRowMapper<>(AsistentePersonal.class),
+                    new AsistentePersonalRowMapper(),
                     idAsistente
             );
         } catch (EmptyResultDataAccessException e) {
@@ -77,7 +76,7 @@ public class AsistentePersonalDao {
     public List<AsistentePersonal> getAsistentesPersonales() {
         return jdbcTemplate.query(
                 "SELECT * FROM AsistentePersonal",
-                new BeanPropertyRowMapper<>(AsistentePersonal.class)
+                new AsistentePersonalRowMapper()
         );
     }
 }

@@ -4,7 +4,6 @@ import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.Estado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -71,7 +70,7 @@ public class APRequestDao {
         try {
             return jdbcTemplate.queryForObject(
                     "SELECT * FROM APRequest WHERE idRequest=?",
-                    new BeanPropertyRowMapper<>(APRequest.class),
+                    new APRequestRowMapper(),
                     idRequest
             );
         } catch (EmptyResultDataAccessException e) {
@@ -83,7 +82,7 @@ public class APRequestDao {
     public List<APRequest> getAPRequests() {
         return jdbcTemplate.query(
                 "SELECT * FROM APRequest",
-                new BeanPropertyRowMapper<>(APRequest.class)
+                new APRequestRowMapper()
         );
     }
 
@@ -91,7 +90,7 @@ public class APRequestDao {
     public List<APRequest> getAPRequestsByUsuario(int idUsuario) {
         return jdbcTemplate.query(
                 "SELECT * FROM APRequest WHERE idUsuario=?",
-                new BeanPropertyRowMapper<>(APRequest.class),
+                new APRequestRowMapper(),
                 idUsuario
         );
     }

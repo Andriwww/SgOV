@@ -6,7 +6,6 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -59,7 +58,7 @@ public class FormadorDao {
         try {
             return jdbcTemplate.queryForObject(
                     "SELECT * FROM Formador WHERE idFormador=?",
-                    new BeanPropertyRowMapper<>(Formador.class),
+                    new FormadorRowMapper(),
                     idFormador
             );
         } catch (EmptyResultDataAccessException e) {
@@ -71,7 +70,7 @@ public class FormadorDao {
     public List<Formador> getFormadores() {
         return jdbcTemplate.query(
                 "SELECT * FROM Formador",
-                new BeanPropertyRowMapper<>(Formador.class)
+                new FormadorRowMapper()
         );
     }
 }
