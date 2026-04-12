@@ -2,9 +2,12 @@ package es.uji.ei1027.clubesportiu.controller;
 
 import es.uji.ei1027.clubesportiu.dao.UsuarioOVIDao;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
+import es.uji.ei1027.clubesportiu.validator.UsuarioOVIValidator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -30,8 +33,12 @@ public class UsuarioOVIController {
         return "UsuarioOVI/add";
     }
 
-    @RequestMapping(value = "/add",  method = RequestMethod.POST)
-    public String addSubmit(@ModelAttribute("usuario") UsuarioOVI usuario) {
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public String addSubmit(@ModelAttribute("usuario") UsuarioOVI usuario, BindingResult bindingResult) {
+        UsuarioOVIValidator validator = new UsuarioOVIValidator();
+        validator.validate(usuario, bindingResult);
+        if (bindingResult.hasErrors())
+            return "UsuarioOVI/add";
         usuarioOVIDao.addUsuarioOVI(usuario);
         return "redirect:list";
     }
