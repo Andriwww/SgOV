@@ -1,242 +1,81 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Editar Usuario OVI</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg: #0f0f0f;
-            --surface: #1a1a1a;
-            --border: #2e2e2e;
-            --accent: #c8f135;
-            --text: #e8e8e8;
-            --muted: #666;
-            --danger: #ff4d4d;
-        }
-
-        body {
-            font-family: 'IBM Plex Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 48px 40px;
-        }
-
-        header {
-            display: flex;
-            align-items: baseline;
-            gap: 16px;
-            margin-bottom: 48px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 24px;
-        }
-
-        h1 {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.4rem;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            color: var(--accent);
-        }
-
-        .subtitle {
-            font-size: 0.8rem;
-            color: var(--muted);
-            font-family: 'IBM Plex Mono', monospace;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            max-width: 800px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        label {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--muted);
-        }
-
-        input[type="text"],
-        input[type="email"] {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.875rem;
-            padding: 10px 12px;
-            border-radius: 2px;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus {
-            border-color: var(--accent);
-        }
-
-        .id-display {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.875rem;
-            color: var(--muted);
-            padding: 10px 12px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 2px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-        }
-
-        input[type="checkbox"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            border-radius: 2px;
-            cursor: pointer;
-            position: relative;
-            transition: border-color 0.15s;
-        }
-
-        input[type="checkbox"]:checked {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
-        input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #0f0f0f;
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
-
-        .checkbox-label {
-            font-size: 0.875rem;
-            font-weight: 300;
-            color: var(--text);
-        }
-
-        .actions {
-            grid-column: 1 / -1;
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .btn-save {
-            padding: 10px 24px;
-            background: var(--accent);
-            color: #0f0f0f;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            border: none;
-            border-radius: 2px;
-            cursor: pointer;
-            transition: opacity 0.15s;
-        }
-
-        .btn-save:hover { opacity: 0.8; }
-
-        .btn-cancel {
-            padding: 10px 24px;
-            background: transparent;
-            color: var(--muted);
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            border: 1px solid var(--border);
-            border-radius: 2px;
-            text-decoration: none;
-            transition: border-color 0.15s, color 0.15s;
-        }
-
-        .btn-cancel:hover {
-            border-color: var(--muted);
-            color: var(--text);
-        }
-    </style>
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/usuarioOVI.css"
+        th:href="@{/css/usuarioOVI.css}" />
 </head>
+
 <body>
+    <main class="container py-4">
+        <h1 class="mb-4">Editar Usuario OVI</h1>
 
-<header>
-    <h1>EDITAR USUARIO OVI</h1>
-    <span class="subtitle" th:text="'// #' + ${usuario.idUsuario}">// #id</span>
-</header>
+        <form th:action="@{/UsuarioOVI/edit}" th:object="${usuario}" method="post">
+            <input type="hidden" th:field="*{idUsuario}" />
 
-<form th:action="@{/UsuarioOVI/edit}" th:object="${usuario}" method="post">
-    <input type="hidden" th:field="*{idUsuario}"/>
-    <div class="form-grid">
-        <div class="form-group">
-            <label>ID Usuario</label>
-            <div class="id-display" th:text="${usuario.idUsuario}"></div>
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" th:field="*{email}" required/>
-        </div>
-        <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" th:field="*{nombre}" required/>
-        </div>
-        <div class="form-group">
-            <label>Apellidos</label>
-            <input type="text" th:field="*{apellidos}" required/>
-        </div>
-        <div class="form-group">
-            <label>Teléfono</label>
-            <input type="text" th:field="*{telefono}"/>
-        </div>
-        <div class="form-group">
-            <label>Dirección</label>
-            <input type="text" th:field="*{direccion}"/>
-        </div>
-        <div class="form-group">
-            <label>Consentimiento RGBD</label>
-            <div class="checkbox-group">
-                <input type="checkbox" th:field="*{consentimientoRGBD}"/>
-                <span class="checkbox-label">Acepta el tratamiento de datos</span>
+            <div class="mb-3 col-md-4">
+                <label class="form-label">ID Usuario</label>
+                <input type="text" th:field="*{idUsuario}" class="form-control" readonly="readonly" />
             </div>
-        </div>
-        <div class="form-group">
-            <label>Estado Aceptado</label>
-            <div class="checkbox-group">
-                <input type="checkbox" th:field="*{estadoAceptado}"/>
-                <span class="checkbox-label">Usuario aceptado en el sistema</span>
-            </div>
-        </div>
-        <div class="actions">
-            <button type="submit" class="btn-save">GUARDAR</button>
-            <a th:href="@{/UsuarioOVI/list}" href="/UsuarioOVI/list" class="btn-cancel">CANCELAR</a>
-        </div>
-    </div>
-</form>
 
+            <div class="mb-3 col-md-4">
+                <label for="email" class="form-label">Email</label>
+                <input id="email" type="email" th:field="*{email}" class="form-control"
+                    th:errorclass="needcorrection" />
+                <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></div>
+            </div>
+
+            <div class="mb-3 col-md-4">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input id="nombre" type="text" th:field="*{nombre}" class="form-control"
+                    th:errorclass="needcorrection" />
+                <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="error"></div>
+            </div>
+
+            <div class="mb-3 col-md-4">
+                <label for="apellidos" class="form-label">Apellidos</label>
+                <input id="apellidos" type="text" th:field="*{apellidos}" class="form-control"
+                    th:errorclass="needcorrection" />
+                <div th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}" class="error"></div>
+            </div>
+
+            <div class="mb-3 col-md-4">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input id="telefono" type="text" th:field="*{telefono}" class="form-control"
+                    th:errorclass="needcorrection" maxlength="9" />
+                <div th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="error"></div>
+            </div>
+
+            <div class="mb-3 col-md-4">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input id="direccion" type="text" th:field="*{direccion}" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" th:field="*{consentimientoRGBD}" />
+                    <label class="form-check-label">Consentimiento RGBD</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" th:field="*{estadoAceptado}" />
+                    <label class="form-check-label">Estado Aceptado</label>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a th:href="@{/UsuarioOVI/list}" class="btn btn-secondary">Cancelar</a>
+            </div>
+
+        </form>
+    </main>
 </body>
+
 </html>

@@ -1,238 +1,64 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Usuarios OVI</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg: #0f0f0f;
-            --surface: #1a1a1a;
-            --border: #2e2e2e;
-            --accent: #c8f135;
-            --text: #e8e8e8;
-            --muted: #666;
-            --danger: #ff4d4d;
-        }
-
-        body {
-            font-family: 'IBM Plex Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 48px 40px;
-        }
-
-        header {
-            display: flex;
-            align-items: baseline;
-            gap: 16px;
-            margin-bottom: 48px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 24px;
-        }
-
-        h1 {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.4rem;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            color: var(--accent);
-        }
-
-        .subtitle {
-            font-size: 0.8rem;
-            color: var(--muted);
-            font-family: 'IBM Plex Mono', monospace;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-        }
-
-        thead tr {
-            border-bottom: 1px solid var(--accent);
-        }
-
-        thead th {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--muted);
-            padding: 10px 16px;
-            text-align: left;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
-        }
-
-        tbody tr:hover {
-            background: var(--surface);
-        }
-
-        tbody td {
-            padding: 14px 16px;
-            color: var(--text);
-            font-weight: 300;
-        }
-
-        td.id {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
-
-        td.name {
-            font-weight: 600;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 2px;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .badge-yes {
-            background: rgba(200, 241, 53, 0.12);
-            color: var(--accent);
-            border: 1px solid rgba(200, 241, 53, 0.3);
-        }
-
-        .badge-no {
-            background: rgba(255, 77, 77, 0.08);
-            color: var(--danger);
-            border: 1px solid rgba(255, 77, 77, 0.2);
-        }
-
-        .empty {
-            text-align: center;
-            padding: 64px;
-            color: var(--muted);
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.85rem;
-        }
-
-        .btn-edit {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: var(--accent);
-            background: transparent;
-            border: 1px solid rgba(200, 241, 53, 0.2);
-            padding: 4px 10px;
-            border-radius: 2px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.15s, border-color 0.15s;
-            margin-right: 6px;
-        }
-
-        .btn-edit:hover {
-            background: rgba(200, 241, 53, 0.08);
-            border-color: var(--accent);
-        }
-
-        .btn-delete {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: var(--danger);
-            background: transparent;
-            border: 1px solid rgba(255, 77, 77, 0.2);
-            padding: 4px 10px;
-            border-radius: 2px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.15s, border-color 0.15s;
-        }
-
-        .btn-delete:hover {
-            background: rgba(255, 77, 77, 0.08);
-            border-color: var(--danger);
-        }
-
-        .btn-add {
-            margin-left: auto;
-            display: inline-block;
-            padding: 8px 18px;
-            background: var(--accent);
-            color: #0f0f0f;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-decoration: none;
-            letter-spacing: 1px;
-            border-radius: 2px;
-            transition: opacity 0.15s;
-        }
-
-        .btn-add:hover { opacity: 0.8; }
-    </style>
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/usuarioOVI.css"
+        th:href="@{/css/usuarioOVI.css}" />
 </head>
+
 <body>
+    <main class="container py-4">
+        <h1 class="mb-4">Usuarios OVI</h1>
 
-<header>
-    <h1>USUARIOS OVI</h1>
-    <span class="subtitle">// listado completo</span>
-    <a th:href="@{/UsuarioOVI/add}" href="/UsuarioOVI/add" class="btn-add">+ AÑADIR</a>
-</header>
+        <div th:if="${#lists.isEmpty(usuarios)}">
+            No hay usuarios en la base de datos.
+        </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Apellidos</th>
-        <th>Email</th>
-        <th>Teléfono</th>
-        <th>Dirección</th>
-        <th>RGBD</th>
-        <th>Aceptado</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="usuario : ${usuarios}">
-        <td class="id" th:text="${usuario.idUsuario}"></td>
-        <td class="name" th:text="${usuario.nombre}"></td>
-        <td th:text="${usuario.apellidos}"></td>
-        <td th:text="${usuario.email}"></td>
-        <td th:text="${usuario.telefono}"></td>
-        <td th:text="${usuario.direccion}"></td>
-        <td>
-            <span th:if="${usuario.consentimientoRGBD}" class="badge badge-yes">Sí</span>
-            <span th:unless="${usuario.consentimientoRGBD}" class="badge badge-no">No</span>
-        </td>
-        <td>
-            <span th:if="${usuario.estadoAceptado}" class="badge badge-yes">Sí</span>
-            <span th:unless="${usuario.estadoAceptado}" class="badge badge-no">No</span>
-        </td>
-        <td>
-            <a th:href="@{/UsuarioOVI/edit/{id}(id=${usuario.idUsuario})}" class="btn-edit">EDITAR</a>
-            <a th:href="@{/UsuarioOVI/delete/{id}(id=${usuario.idUsuario})}" class="btn-delete">ELIMINAR</a>
-        </td>
-    </tr>
-    <tr th:if="${#lists.isEmpty(usuarios)}">
-        <td colspan="9" class="empty">// sin registros</td>
-    </tr>
-    </tbody>
-</table>
+        <table th:unless="${#lists.isEmpty(usuarios)}" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>RGBD</th>
+                    <th>Aceptado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td th:text="${usuario.idUsuario}"></td>
+                    <td th:text="${usuario.nombre}"></td>
+                    <td th:text="${usuario.apellidos}"></td>
+                    <td th:text="${usuario.email}"></td>
+                    <td th:text="${usuario.telefono}"></td>
+                    <td th:text="${usuario.direccion}"></td>
+                    <td th:text="${usuario.consentimientoRGBD ? 'Sí' : 'No'}"></td>
+                    <td th:text="${usuario.estadoAceptado ? 'Sí' : 'No'}"></td>
+                    <td>
+                        <a th:href="@{/UsuarioOVI/edit/{id}(id=${usuario.idUsuario})}"
+                            class="btn btn-sm btn-outline-warning">Editar</a>
+                        <a th:href="@{/UsuarioOVI/confirm-delete/{id}(id=${usuario.idUsuario})}"
+                            class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
+        <a th:href="@{/UsuarioOVI/add}" class="btn btn-primary mt-3">+ Añadir</a>
+
+    </main>
 </body>
+
 </html>
 
 <!-- http://localhost:8080/UsuarioOVI/list -->
+<!-- http://localhost:8080/UsuarioOVI/add -->
+<!-- http://localhost:8080/UsuarioOVI/edit -->

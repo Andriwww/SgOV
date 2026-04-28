@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
 @Controller
 @RequestMapping("/UsuarioOVI")
 public class UsuarioOVIController {
@@ -55,7 +56,14 @@ public class UsuarioOVIController {
         return "redirect:/UsuarioOVI/list";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/confirm-delete/{id}")
+    public String confirmDelete(@PathVariable int id, Model model) {
+        model.addAttribute("usuario", usuarioOVIDao.getUsuarioOVI(id));
+        return "UsuarioOVI/delete";
+    }
+    
+
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable int id) {
         usuarioOVIDao.deleteUsuarioOVI(id);
         return "redirect:/UsuarioOVI/list";
