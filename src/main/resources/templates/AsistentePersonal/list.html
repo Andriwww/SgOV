@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Asistentes Personales</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/asistentePersonal.css}">
+</head>
+
+<body>
+
+<main class="container py-4">
+
+    <h1 class="mb-4">Asistentes Personales</h1>
+
+    <a class="btn btn-success mb-3"
+       th:href="@{/AsistentePersonal/add}">
+        Nuevo asistente
+    </a>
+
+    <table class="table table-striped">
+
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Activo</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="a : ${asistentes}">
+            <td th:text="${a.idAsistente}"></td>
+            <td th:text="${a.nombre}"></td>
+            <td th:text="${a.apellidos}"></td>
+            <td th:text="${a.email}"></td>
+            <td th:text="${a.telefono}"></td>
+            <td th:text="${a.activo}"></td>
+
+            <td>
+                <a th:href="@{/AsistentePersonal/update/{id}(id=${a.idAsistente})}"
+                   class="btn btn-warning btn-sm">Editar</a>
+
+                <a th:href="@{/AsistentePersonal/delete/{id}(id=${a.idAsistente})}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('¿Seguro?')">
+                    Borrar
+                </a>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+
+</main>
+
+</body>
+</html>
