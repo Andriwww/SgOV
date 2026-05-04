@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AP Requests</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/apRequest.css}">
+</head>
+
+<body>
+
+<main class="container py-4">
+
+    <h1 class="mb-4">Solicitudes AP</h1>
+
+    <a class="btn btn-primary mb-3" th:href="@{/APRequest/add}">
+        Nueva solicitud
+    </a>
+
+    <table class="table table-striped">
+
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="r : ${requests}">
+            <td th:text="${r.idRequest}"></td>
+            <td th:text="${r.idUsuario}"></td>
+            <td th:text="${r.fechaSolicitud}"></td>
+            <td th:text="${r.descripcion}"></td>
+            <td th:text="${r.estado}"></td>
+
+            <td>
+                <a class="btn btn-sm btn-warning"
+                   th:href="@{/APRequest/edit/{id}(id=${r.idRequest})}">
+                    Editar
+                </a>
+
+                <a class="btn btn-sm btn-danger"
+                   th:href="@{/APRequest/delete/{id}(id=${r.idRequest})}">
+                    Eliminar
+                </a>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+
+</main>
+
+</body>
+</html>
