@@ -23,15 +23,14 @@ public class AsistentePersonalDao {
     public void addAsistentePersonal(AsistentePersonal asistente) {
 
         jdbcTemplate.update(
-                "INSERT INTO AsistentePersonal VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                asistente.getIdAsistente(),
-                asistente.getNombre(),
-                asistente.getApellidos(),
-                asistente.getEmail(),
-                asistente.getTelefono(),
-                asistente.getDisponibilidad(),
-                asistente.isEstadoAceptado(),
-                asistente.isActivo()
+            "INSERT INTO AsistentePersonal (nombre, apellidos, email, telefono, disponibilidad, estadoAceptado, activo) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            asistente.getNombre(),
+            asistente.getApellidos(),
+            asistente.getEmail(),
+            asistente.getTelefono(),
+            asistente.getDisponibilidad(),
+            asistente.isEstadoAceptado(),
+            asistente.isActivo()
         );
     }
 
