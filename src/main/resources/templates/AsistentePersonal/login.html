@@ -17,7 +17,7 @@
 
     <h1 class="mb-4">Añadir Asistente Personal</h1>
 
-    <form th:action="@{/AsistentePersonal/add}"
+    <form th:action="@{/AsistentePersonal/login}"
           th:object="${asistente}"
           method="post">
 
@@ -57,6 +57,18 @@
                  class="error"></div>
         </div>
 
+        <!-- CONTRASEÑA -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Contraseña</label>
+            <input type="contraseña"
+                   th:field="*{contraseña}"
+                   class="form-control"
+                   th:errorclass="needcorrection" />
+            <div th:if="${#fields.hasErrors('contraseña')}"
+                 th:errors="*{contraseña}"
+                 class="error"></div>
+        </div>
+
         <!-- TELEFONO -->
         <div class="mb-3 col-md-4">
             <label class="form-label">Teléfono</label>
@@ -80,21 +92,6 @@
             <div th:if="${#fields.hasErrors('disponibilidad')}"
                  th:errors="*{disponibilidad}"
                  class="error"></div>
-        </div>
-
-        <!-- CHECKS -->
-        <div class="form-check mb-2">
-            <input class="form-check-input"
-                   type="checkbox"
-                   th:field="*{estadoAceptado}" />
-            <label class="form-check-label">Estado aceptado</label>
-        </div>
-
-        <div class="form-check mb-3">
-            <input class="form-check-input"
-                   type="checkbox"
-                   th:field="*{activo}" />
-            <label class="form-check-label">Activo</label>
         </div>
 
         <!-- BOTONES -->

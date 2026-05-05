@@ -27,14 +27,14 @@ public class AsistentePersonalController {
     }
 
     // ADD FORM
-    @RequestMapping("/add")
+    @RequestMapping("/login")
     public String addForm(Model model) {
         model.addAttribute("asistente", new AsistentePersonal());
-        return "AsistentePersonal/add";
+        return "AsistentePersonal/login";
     }
 
     // ADD SUBMIT
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String addSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
                             BindingResult result) {
 
@@ -42,7 +42,7 @@ public class AsistentePersonalController {
         validator.validate(asistente, result);
 
         if (result.hasErrors()) {
-            return "AsistentePersonal/add";
+            return "AsistentePersonal/login";
         }
 
         asistentePersonalDao.addAsistentePersonal(asistente);
