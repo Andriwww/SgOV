@@ -3,6 +3,8 @@ package es.uji.ei1027.clubesportiu.controller;
 
 import es.uji.ei1027.clubesportiu.dao.APRequestDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
+import es.uji.ei1027.clubesportiu.model.Estado;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +37,9 @@ public class APRequestController {
     // GUARDAR
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String addSubmit(@ModelAttribute("request") APRequest request) {
+
+        request.setEstado(Estado.Pendiente); 
+
         apRequestDao.addAPRequest(request);
         return "redirect:list";
     }

@@ -23,21 +23,15 @@ public class APRequestDao {
 
     // INSERT
     public void addAPRequest(APRequest request) {
-        int idRequest = request.getIdRequest();
-        int idUsuario = request.getIdUsuario();
-        LocalDate fechaSolicitud = request.getFechaSolicitud();
-        String descripcion = request.getDescripcion();
-        Estado estado = request.getEstado();
 
-        jdbcTemplate.update(
-                "INSERT INTO APRequest VALUES (?, ?, ?, ?, ?)",
-                idRequest,
-                idUsuario,
-                fechaSolicitud,
-                descripcion,
-                estado.name()
-        );
-    }
+    jdbcTemplate.update(
+        "INSERT INTO APRequest (idUsuario, fechaSolicitud, descripcion, estado) VALUES (?, ?, ?, ?)",
+        request.getIdUsuario(),
+        java.sql.Date.valueOf(request.getFechaSolicitud()),
+        request.getDescripcion(),
+        request.getEstado().name()
+    );
+}
 
     // DELETE
     public void deleteAPRequest(int idRequest) {
