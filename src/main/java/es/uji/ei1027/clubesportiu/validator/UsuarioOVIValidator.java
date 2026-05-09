@@ -41,6 +41,12 @@ public class UsuarioOVIValidator implements Validator {
             }
         }
 
+        if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
+            errors.rejectValue("password", "obligatorio", "La contraseña es obligatoria");
+        } else if (usuario.getPassword().length() < 6) {
+            errors.rejectValue("password", "longitud", "La contraseña debe tener al menos 6 caracteres");
+        }
+
         if (usuario.getTelefono() != null && !usuario.getTelefono().trim().equals(""))
             if (!usuario.getTelefono().matches("^[0-9]{9}$"))
                 errors.rejectValue("telefono", "formato", "El teléfono debe tener 9 dígitos numéricos");

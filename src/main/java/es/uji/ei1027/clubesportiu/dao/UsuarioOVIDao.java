@@ -23,15 +23,16 @@ public class UsuarioOVIDao {
 
     public void addUsuarioOVI(UsuarioOVI usuario) {
         jdbcTemplate.update(
-                "INSERT INTO usuarioovi (nombre, apellidos, email, telefono, direccion, consentimientorgbd, estadoaceptado) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO usuarioovi (nombre, apellidos, email, telefono, direccion, consentimientorgbd, estadoaceptado, password) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 usuario.getNombre(),
                 usuario.getApellidos(),
                 usuario.getEmail(),
                 usuario.getTelefono(),
                 usuario.getDireccion(),
                 usuario.isConsentimientoRGBD(),
-                usuario.isEstadoAceptado());
+                usuario.isEstadoAceptado(),
+                usuario.getPassword());
     }
 
     public void deleteUsuarioOVI(int idUsuario) {
@@ -69,12 +70,12 @@ public class UsuarioOVIDao {
                 new UsuarioOVIRowMapper());
     }
 
-    public UsuarioOVI loadUserByUsername(String username, String password) {
+    public UsuarioOVI loadUserByUsername(String username) {
         try {
             return jdbcTemplate.queryForObject(
-                "SELECT * FROM usuario_ovi WHERE (nombre = ? OR email = ?) AND password = ?",
+                "SELECT * FROM usuario_ovi WHERE nombre = ? OR email = ?",
                 new UsuarioOVIRowMapper(), 
-                username, username, password
+                username, username
             );
         } catch (EmptyResultDataAccessException e) {
             return null;

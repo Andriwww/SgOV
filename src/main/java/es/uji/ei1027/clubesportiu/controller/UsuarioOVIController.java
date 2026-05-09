@@ -1,5 +1,6 @@
 package es.uji.ei1027.clubesportiu.controller;
 
+import org.jasypt.util.password.BasicPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,9 +49,15 @@ public class UsuarioOVIController {
         if (bindingResult.hasErrors()) {
             return "UsuarioOVI/register";
         }
+        
+        BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
+        String passEncriptada = passwordEncryptor.encryptPassword(usuario.getPassword());
+    
+        usuario.setPassword(passEncriptada);
+
         usuario.setEstadoAceptado(false);
         usuarioOVIDao.addUsuarioOVI(usuario);
-        return "redirect:/";
+        return "redirect:/UsuarioOVI/login";
     }
 
     @GetMapping("/edit/{id}")
@@ -92,7 +99,7 @@ public class UsuarioOVIController {
             return "UsuarioOVI/login";
         }
 
-        UsuarioOVI usuario = usuarioOVIDao.loadUserByUsername(userDetails.getUsuario(), userDetails.getPassword());
+        UsuarioOVI usuario = usuarioOVIDao.loadUserByUsername(userDetails.getUsuario());
 
         if (usuario == null) {
             session.setAttribute("error", "Usuario o contraseña incorrectos");

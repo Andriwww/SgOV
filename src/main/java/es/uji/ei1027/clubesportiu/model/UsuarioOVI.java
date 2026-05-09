@@ -10,6 +10,7 @@ public class UsuarioOVI {
     private String direccion;
     private boolean consentimientoRGBD;
     private boolean estadoAceptado;
+    private String password;
 
     public UsuarioOVI() {
     }
@@ -76,6 +77,14 @@ public class UsuarioOVI {
 
     public void setEstadoAceptado(boolean estadoAceptado) {
         this.estadoAceptado = estadoAceptado;
+    }
+
+    public String getPassword() { 
+        return password; 
+    }
+    
+    public void setPassword(String password) { 
+        this.password = password; 
     }
 
     @Override

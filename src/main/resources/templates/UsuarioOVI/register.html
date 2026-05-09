@@ -38,6 +38,13 @@
             </div>
 
             <div class="mb-3 col-md-4">
+                <label for="password" class="form-label">Contraseña</label>
+                <input id="password" type="password" th:field="*{password}" class="form-control"
+                    th:errorclass="needcorrection" placeholder="Contraseña" />
+                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></div>
+            </div>
+
+            <div class="mb-3 col-md-4">
                 <label for="telefono" class="form-label">Teléfono (Opcional)</label>
                 <input id="telefono" type="text" th:field="*{telefono}" class="form-control"
                     th:errorclass="needcorrection" placeholder="9 dígitos" maxlength="9" />
