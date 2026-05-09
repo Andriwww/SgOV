@@ -10,4 +10,9 @@ public class InicioController {
     public String mostrarInicio() {
         return "Inicio/inicio"; 
     }
+
+    @GetMapping("/Inicio/logins")
+    public String mostrarLogins() {
+        return "Inicio/logins"; // Devuelve la plantilla logins.html
+    }
 }

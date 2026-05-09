@@ -50,6 +50,15 @@ h1 {
     text-decoration: none;
 }
 
+.navbar-brand {
+    cursor: pointer !important;
+    transition: opacity 0.2s;
+}
+
+.navbar-brand:hover {
+    opacity: 0.8;
+}
+
 .btn-teal {
     background-color: #0d9488;
     color: white;

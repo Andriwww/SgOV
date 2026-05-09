@@ -26,29 +26,18 @@ public class APRequestValidator implements Validator {
         // fechaSolicitud obligatoria
         if (request.getFechaSolicitud() == null) {
             errors.rejectValue("fechaSolicitud", "obligatorio", "La fecha de solicitud es obligatoria");
-        } else if (request.getFechaSolicitud().isAfter(LocalDate.now())) {
-            errors.rejectValue("fechaSolicitud", "formato", "La fecha no puede ser futura");
+        } else if (request.getFechaSolicitud().isBefore(LocalDate.now())) {
+            errors.rejectValue("fechaSolicitud", "formato", "La fecha de la asistencia no puede estar en el pasado");
         }
 
         // descripcion opcional pero con límite razonable
-        if (request.getDescripcion() != null && request.getDescripcion().length() > 500) {
-            errors.rejectValue("descripcion", "longitud", "La descripción no puede superar 500 caracteres");
+        if (request.getDescripcion() != null && request.getDescripcion().length() > 1000) {
+            errors.rejectValue("descripcion", "longitud", "La descripción no puede superar 1000 caracteres");
         }
 
         // estado obligatorio (aunque tenga default en BD)
         if (request.getEstado() == null) {
             errors.rejectValue("estado", "obligatorio", "El estado es obligatorio");
-        } else {
-            boolean valido = false;
-            for (Estado e : Estado.values()) {
-                if (e.equals(request.getEstado())) {
-                    valido = true;
-                    break;
-                }
-            }
-            if (!valido) {
-                errors.rejectValue("estado", "formato", "Estado no válido");
-            }
-        }
+        } 
     }
 }

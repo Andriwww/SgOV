@@ -1,13 +1,15 @@
 package es.uji.ei1027.clubesportiu.dao;
 
-import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.util.List;
+import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
 
 @Repository
 public class UsuarioOVIDao {
@@ -65,5 +67,17 @@ public class UsuarioOVIDao {
         return jdbcTemplate.query(
                 "SELECT * FROM usuarioovi",
                 new UsuarioOVIRowMapper());
+    }
+
+    public UsuarioOVI loadUserByUsername(String username, String password) {
+        try {
+            return jdbcTemplate.queryForObject(
+                "SELECT * FROM usuario_ovi WHERE (nombre = ? OR email = ?) AND password = ?",
+                new UsuarioOVIRowMapper(), 
+                username, username, password
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }

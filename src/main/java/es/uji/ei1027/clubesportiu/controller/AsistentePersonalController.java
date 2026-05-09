@@ -28,8 +28,7 @@ public class AsistentePersonalController {
 
     // ADD FORM
     @RequestMapping("/login")
-    public String addForm(Model model) {
-        model.addAttribute("asistente", new AsistentePersonal());
+    public String login() {
         return "AsistentePersonal/login";
     }
 
