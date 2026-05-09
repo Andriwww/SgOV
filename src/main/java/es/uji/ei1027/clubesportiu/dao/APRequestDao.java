@@ -25,7 +25,7 @@ public class APRequestDao {
     public void addAPRequest(APRequest request) {
 
     jdbcTemplate.update(
-        "INSERT INTO APRequest (idUsuario, fechaSolicitud, descripcion, estado) VALUES (?, ?, ?, ?)",
+        "INSERT INTO aprequest (idusuario, fechasolicitud, descripcion, estado) VALUES (?, ?, ?, CAST(? AS estado))",
         request.getIdUsuario(),
         java.sql.Date.valueOf(request.getFechaSolicitud()),
         request.getDescripcion(),
@@ -36,7 +36,7 @@ public class APRequestDao {
     // DELETE
     public void deleteAPRequest(int idRequest) {
         jdbcTemplate.update(
-                "DELETE FROM APRequest WHERE idRequest = ?",
+                "DELETE FROM aprequest WHERE idrequest = ?",
                 idRequest
         );
     }
@@ -50,7 +50,7 @@ public class APRequestDao {
         Estado estado = request.getEstado();
 
         jdbcTemplate.update(
-                "UPDATE APRequest SET idUsuario=?, fechaSolicitud=?, descripcion=?, estado=? WHERE idRequest=?",
+                "UPDATE aprequest SET idusuario=?, fechaSolicitud=?, descripcion=?, estado=? WHERE idrequest=?",
                 idUsuario,
                 fechaSolicitud,
                 descripcion,
@@ -63,7 +63,7 @@ public class APRequestDao {
     public APRequest getAPRequest(int idRequest) {
         try {
             return jdbcTemplate.queryForObject(
-                    "SELECT * FROM APRequest WHERE idRequest=?",
+                    "SELECT * FROM aprequest WHERE idrequest=?",
                     new APRequestRowMapper(),
                     idRequest
             );
@@ -75,7 +75,7 @@ public class APRequestDao {
     // GET ALL
     public List<APRequest> getAPRequests() {
         return jdbcTemplate.query(
-                "SELECT * FROM APRequest",
+                "SELECT * FROM aprequest",
                 new APRequestRowMapper()
         );
     }
@@ -83,7 +83,7 @@ public class APRequestDao {
     // GET BY USER
     public List<APRequest> getAPRequestsByUsuario(int idUsuario) {
         return jdbcTemplate.query(
-                "SELECT * FROM APRequest WHERE idUsuario=?",
+                "SELECT * FROM aprequest WHERE idusuario=?",
                 new APRequestRowMapper(),
                 idUsuario
         );

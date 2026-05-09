@@ -56,7 +56,7 @@ public class APRequestController {
             apRequest.setIdUsuario(usuarioLogueado.getIdUsuario());
         }
 
-        apRequest.setEstado(Estado.Pendiente);
+        apRequest.setEstado(Estado.pendiente);
 
         APRequestValidator validator = new APRequestValidator();
         validator.validate(apRequest, bindingResult);
@@ -67,7 +67,7 @@ public class APRequestController {
 
         apRequestDao.addAPRequest(apRequest);
         
-        return "redirect:/UsuarioOVI/dashboard";
+        return "redirect:/APRequest/list";
     }
 
     // FORMULARIO EDITAR

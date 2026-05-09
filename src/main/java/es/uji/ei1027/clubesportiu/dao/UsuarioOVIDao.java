@@ -73,9 +73,9 @@ public class UsuarioOVIDao {
     public UsuarioOVI loadUserByUsername(String username) {
         try {
             return jdbcTemplate.queryForObject(
-                "SELECT * FROM usuario_ovi WHERE nombre = ? OR email = ?",
+                "SELECT * FROM usuarioovi WHERE email = ?",
                 new UsuarioOVIRowMapper(), 
-                username, username
+                username
             );
         } catch (EmptyResultDataAccessException e) {
             return null;

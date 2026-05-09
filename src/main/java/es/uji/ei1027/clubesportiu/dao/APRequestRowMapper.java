@@ -11,9 +11,9 @@ public class APRequestRowMapper implements RowMapper<APRequest> {
     @Override
     public APRequest mapRow(ResultSet rs, int rowNum) throws SQLException {
         APRequest request = new APRequest();
-        request.setIdRequest(rs.getInt("idRequest"));
-        request.setIdUsuario(rs.getInt("idUsuario"));
-        request.setFechaSolicitud(rs.getDate("fechaSolicitud").toLocalDate());
+        request.setIdRequest(rs.getInt("idrequest"));
+        request.setIdUsuario(rs.getInt("idusuario"));
+        request.setFechaSolicitud(rs.getDate("fechasolicitud").toLocalDate());
         request.setDescripcion(rs.getString("descripcion"));
         request.setEstado(Estado.valueOf(rs.getString("estado")));
         return request;
