@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.uji.ei1027.clubesportiu.dao.UsuarioOVIDao;
+import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UserDetails;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
 import es.uji.ei1027.clubesportiu.validator.UsuarioOVIValidator;
@@ -93,7 +94,7 @@ public class UsuarioOVIController {
 
     @RequestMapping(value="/login", method=RequestMethod.POST)
     public String checkLogin(@ModelAttribute("user") UserDetails userDetails, 
-                             BindingResult bindingResult, HttpSession session) {
+                             BindingResult bindingResult, HttpSession session, Model model) {
         
         if (bindingResult.hasErrors()) {
             return "UsuarioOVI/login";
@@ -102,8 +103,14 @@ public class UsuarioOVIController {
         UsuarioOVI usuario = usuarioOVIDao.loadUserByUsername(userDetails.getUsuario());
 
         if (usuario == null) {
-            session.setAttribute("error", "Usuario o contraseña incorrectos");
-            return "redirect:/UsuarioOVI/login";
+            model.addAttribute("error", "Credenciales incorrectas");
+            return "/UsuarioOVI/login";
+        }
+
+        BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
+        if (!passwordEncryptor.checkPassword(userDetails.getPassword(), usuario.getPassword())) {
+            model.addAttribute("error", "Credenciales incorrectas");
+            return "/UsuarioOVI/login";
         }
 
         if (!usuario.isEstadoAceptado()) {
@@ -134,5 +141,24 @@ public class UsuarioOVIController {
         }
         model.addAttribute("nombreUsuario", usuario.getNombre());
         return "UsuarioOVI/dashboard";
+    }
+
+    @RequestMapping(value="/aceptar/{id}", method = RequestMethod.GET)
+    public String aceptarUsuario(@PathVariable int id, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            session.invalidate();
+            return "redirect:/";
+        }
+
+        UsuarioOVI usuario = usuarioOVIDao.getUsuarioOVI(id);
+        
+        if (usuario != null) {
+            usuario.setEstadoAceptado(true);
+            
+            usuarioOVIDao.updateUsuarioOVI(usuario);
+        }
+
+        return "redirect:/UsuarioOVI/list";
     }
 }

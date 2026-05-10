@@ -3,27 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SgOVI - Mis Peticiones</title>
+    <title th:text="${rol == 'TECNICO' ? 'SgOVI - Gestión de Peticiones' : 'SgOVI - Mis Peticiones'}">SgOVI - Peticiones</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/usuarioOVI.css}" />
+    <style>
+        .btn-action-group {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
         <div class="container">
-            <a class="navbar-brand text-teal fw-bold" th:href="@{/UsuarioOVI/dashboard}">
-                SgOVI - Área Personal
+            <a class="navbar-brand text-teal fw-bold" th:href="${rol == 'TECNICO' ? '/TecnicoOVI/dashboard' : '/UsuarioOVI/dashboard'}">
+                SgOVI - <span th:text="${rol == 'TECNICO' ? 'Gestión Técnica' : 'Área Personal'}">Área</span>
             </a>
             <div class="d-flex align-items-center">
-                <a th:href="@{/UsuarioOVI/logout}" class="btn btn-outline-danger btn-sm fw-bold">Cerrar Sesión</a>
+                <a th:href="${rol == 'TECNICO' ? '/TecnicoOVI/logout' : '/UsuarioOVI/logout'}" class="btn btn-outline-danger btn-sm fw-bold">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
 
     <main class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="text-teal fw-bold">Mis Peticiones de Asistencia</h2>
-            <a th:href="@{/UsuarioOVI/dashboard}" class="btn btn-teal">Volver</a>
+            <h2 class="text-teal fw-bold" th:text="${rol == 'TECNICO' ? 'Gestión Global de Solicitudes' : 'Mis Peticiones de Asistencia'}">
+                Peticiones
+            </h2>
+            <a th:href="${rol == 'TECNICO' ? '/TecnicoOVI/dashboard' : '/UsuarioOVI/dashboard'}" class="btn btn-teal">Volver</a>
         </div>
 
         <div class="card shadow-sm border-0 rounded-3">
@@ -31,48 +41,67 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Fecha Solicitada</th>
+                            <th class="ps-4" th:if="${rol == 'TECNICO'}">ID Usuario</th>
+                            <th th:classappend="${rol != 'TECNICO' ? 'ps-4' : ''}">Fecha</th>
                             <th>Descripción</th>
                             <th>Estado</th>
-                            <th>Candidatos</th>
-                            <th class="text-center">Acciones</th>
+                            <th th:if="${rol == 'TECNICO'}" class="text-center">Acciones del Técnico</th>
+                            <th th:if="${rol == 'USUARIO'}" class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:each="request : ${requests}">
                             
-                            <td class="ps-4 fw-bold" th:text="${request.fechaSolicitud}">01/01/2024</td>
+                            <td class="ps-4 fw-bold text-teal" th:if="${rol == 'TECNICO'}" th:text="${request.idUsuario}">123</td>
+                            
+                            <td th:classappend="${rol != 'TECNICO' ? 'ps-4 fw-bold' : 'fw-bold'}" th:text="${request.fechaSolicitud}">01/01/2024</td>
                             
                             <td th:text="${request.descripcion}">Descripción...</td>
                             
                             <td>
                                 <div th:switch="${request.estado.name()}">
                                     <span th:case="'pendiente'" class="badge rounded-pill bg-warning text-dark">Pendiente</span>
-                                    <span th:case="'enrevision'" class="badge rounded-pill bg-info text-dark">En revisión</span>
+                                    <span th:case="'en_revision'" class="badge rounded-pill bg-info text-dark">En revisión</span>
                                     <span th:case="'aprobada'" class="badge rounded-pill bg-success">Aprobada</span>
                                     <span th:case="'rechazada'" class="badge rounded-pill bg-danger">Rechazada</span>
-                                    <span th:case="'concontrato'" class="badge rounded-pill bg-primary">Con contrato</span>
+                                    <span th:case="'con_contrato'" class="badge rounded-pill bg-primary">Con contrato</span>
                                     <span th:case="'finalizada'" class="badge rounded-pill bg-secondary">Finalizada</span>
                                     <span th:case="*" class="badge rounded-pill bg-secondary" th:text="${request.estado}">-</span>
                                 </div>
                             </td>
                             
-                            <td>
-                                <span class="text-muted small italic">Buscando profesionales...</span>
-                            </td>
-                            
                             <td class="text-center pe-4">
-                                <a th:href="@{/APRequest/delete/{id}(id=${request.idRequest})}" 
+                                
+                                <a th:if="${rol == 'USUARIO'}" 
+                                   th:href="@{/APRequest/delete/{id}(id=${request.idRequest})}" 
                                    class="btn btn-outline-danger btn-sm"
-                                   onclick="return confirm('¿Estás seguro de que deseas cancelar esta petición?')">
-                                    Eliminar
+                                   onclick="return confirm('¿Deseas cancelar esta solicitud?')">
+                                    Cancelar Petición
                                 </a>
+
+                                <div th:if="${rol == 'TECNICO'}" class="btn-action-group">
+                                    <a th:href="@{/APRequest/update/{id}(id=${request.idRequest})}" 
+                                       class="btn btn-outline-secondary btn-sm" title="Modificar estado">
+                                        Estado
+                                    </a>
+                                    
+                                    <a th:href="@{/APRequest/assign/{id}(id=${request.idRequest})}" 
+                                       class="btn btn-outline-primary btn-sm" title="Gestionar candidatos">
+                                        Asignar Asistentes
+                                    </a>
+                                    
+                                    <a th:href="@{/Contrato/add/{id}(id=${request.idRequest})}" 
+                                       class="btn btn-teal btn-sm" title="Formalizar contrato">
+                                        Crear Contrato
+                                    </a>
+                                </div>
+
                             </td>
                         </tr>
                         
                         <tr th:if="${#lists.isEmpty(requests)}">
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                No has realizado ninguna petición todavía.
+                            <td th:colspan="${rol == 'TECNICO' ? 5 : 4}" class="text-center py-5 text-muted">
+                                No hay solicitudes registradas.
                             </td>
                         </tr>
                     </tbody>

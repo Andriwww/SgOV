@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import es.uji.ei1027.clubesportiu.dao.APRequestDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.Estado;
+import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
 import es.uji.ei1027.clubesportiu.validator.APRequestValidator;
 import jakarta.servlet.http.HttpSession;
@@ -32,12 +33,22 @@ public class APRequestController {
     // LISTAR
     @RequestMapping("/list")
     public String list(Model model, HttpSession session) {
-        UsuarioOVI usuarioLogueado = (UsuarioOVI) session.getAttribute("usuarioLogueado");
-        if (usuarioLogueado == null) {
-            return "redirect:/login";
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+
+        if (tecnico != null) {
+            model.addAttribute("requests", apRequestDao.getAPRequests());
+            model.addAttribute("rol", "TECNICO");
+            return "APRequest/list";
         }
-        model.addAttribute("requests", apRequestDao.getAPRequestsByUsuario(usuarioLogueado.getIdUsuario()));
-        return "APRequest/list";
+
+        if (usuario != null) {
+            model.addAttribute("requests", apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario()));
+            model.addAttribute("rol", "USUARIO");
+            return "APRequest/list";
+        }
+
+        return "redirect:/";
     }
 
     // FORMULARIO AÑADIR
@@ -81,6 +92,40 @@ public class APRequestController {
     @PostMapping("/edit")
     public String editSubmit(@ModelAttribute APRequest request) {
         apRequestDao.updateAPRequest(request);
+        return "redirect:/APRequest/list";
+    }
+
+    // MOSTRAR EL FORMULARIO DE EDICIÓN
+    @RequestMapping(value="/update/{id}", method = RequestMethod.GET)
+    public String editRequest(Model model, @PathVariable int id, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/";
+        }
+
+        APRequest request = apRequestDao.getAPRequest(id);
+        
+        model.addAttribute("aprequest", request);
+        
+        return "APRequest/update";
+    }
+
+    // GUARDAR LOS CAMBIOS
+    @RequestMapping(value="/update", method = RequestMethod.POST)
+    public String processUpdateSubmit(@ModelAttribute("aprequest") APRequest request, 
+                                    BindingResult bindingResult, HttpSession session) {
+
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/";
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "APRequest/update";
+        }
+
+        apRequestDao.updateEstadoAPRequest(request);
+        
         return "redirect:/APRequest/list";
     }
 

@@ -59,6 +59,14 @@ public class APRequestDao {
         );
     }
 
+    public void updateEstadoAPRequest(APRequest request) {
+        jdbcTemplate.update(
+                "UPDATE aprequest SET estado=CAST(? AS estado) WHERE idrequest=?",
+                request.getEstado().name(), 
+                request.getIdRequest()
+        );
+    }
+
     // GET ONE
     public APRequest getAPRequest(int idRequest) {
         try {
