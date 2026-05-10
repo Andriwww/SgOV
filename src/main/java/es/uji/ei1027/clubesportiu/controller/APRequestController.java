@@ -1,6 +1,8 @@
 package es.uji.ei1027.clubesportiu.controller;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.uji.ei1027.clubesportiu.dao.APRequestDao;
+import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
+import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.model.Estado;
 import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
@@ -24,6 +28,8 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/APRequest")
 public class APRequestController {
     private APRequestDao apRequestDao;
+    
+    private AsistentePersonalDao asistentePersonalDao;
 
     @Autowired
     public void setApRequestDao(APRequestDao apRequestDao) {
@@ -79,6 +85,19 @@ public class APRequestController {
         apRequestDao.addAPRequest(apRequest);
         
         return "redirect:/APRequest/list";
+    }
+
+    @GetMapping("/assign/{id}")
+    public String assignAssistants(@PathVariable int id, Model model) {
+
+        APRequest request = apRequestDao.getAPRequest(id);
+
+        List<AsistentePersonal> candidatos = asistentePersonalDao.buscarCompatibles(request);
+
+        model.addAttribute("request", request);
+        model.addAttribute("candidatos", candidatos);
+
+        return "APRequest/assign";
     }
 
     // FORMULARIO EDITAR

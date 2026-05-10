@@ -18,6 +18,9 @@ public class AsistentePersonalRowMapper implements RowMapper<AsistentePersonal> 
         asistente.setDisponibilidad(rs.getString("disponibilidad"));
         asistente.setEstadoAceptado(rs.getBoolean("estadoAceptado"));
         asistente.setActivo(rs.getBoolean("activo"));
+        asistente.setZona(rs.getString("zona"));
+        asistente.setPreferencias(rs.getString("preferencias"));
+        asistente.setPuntuacion(rs.getInt("puntuacion"));
         return asistente;
     }
 }

@@ -3,6 +3,9 @@ package es.uji.ei1027.clubesportiu.controller;
 import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -71,6 +74,7 @@ public class AsistentePersonalController {
         asistentePersonalDao.updateAsistentePersonal(asistente);
         return "redirect:list";
     }
+
 
     // DELETE
     @RequestMapping("/delete/{idAsistente}")

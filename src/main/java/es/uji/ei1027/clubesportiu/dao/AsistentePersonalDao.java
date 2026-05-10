@@ -1,5 +1,6 @@
 package es.uji.ei1027.clubesportiu.dao;
 
+import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -78,4 +79,13 @@ public class AsistentePersonalDao {
                 new AsistentePersonalRowMapper()
         );
     }
+
+    // SEARCH CANDIDATES
+    public List<AsistentePersonal> buscarCompatibles(APRequest request) {
+
+    return jdbcTemplate.query(
+            "SELECT * FROM AsistentePersonal",
+            new AsistentePersonalRowMapper()
+    );
+}
 }

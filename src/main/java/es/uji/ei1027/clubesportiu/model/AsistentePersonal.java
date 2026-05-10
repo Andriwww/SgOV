@@ -1,5 +1,7 @@
 package es.uji.ei1027.clubesportiu.model;
 
+import java.util.List;
+
 public class AsistentePersonal {
 
     private int idAsistente;
@@ -10,6 +12,9 @@ public class AsistentePersonal {
     private String disponibilidad;
     private boolean estadoAceptado;
     private boolean activo;
+    private String zona;
+    private String preferencias;
+    private int puntuacion;
 
     public AsistentePersonal() {
     }
@@ -78,6 +83,30 @@ public class AsistentePersonal {
         this.activo = activo;
     }
 
+    public String getZona() {
+        return zona;
+    }
+
+    public void setZona(String zona) {
+        this.zona = zona;
+    }
+
+    public String getPreferencias() {
+        return preferencias;
+    }
+
+    public void setPreferencias(String preferencias) {
+        this.preferencias = preferencias;
+    }
+
+    public int getPuntuacion() {
+        return puntuacion;
+    }
+
+    public void setPuntuacion(int puntuacion) {
+        this.puntuacion = puntuacion;
+    }
+
     @Override
     public String toString() {
         return "AsistentePersonal{" +
@@ -91,4 +120,6 @@ public class AsistentePersonal {
                 ", activo=" + activo +
                 '}';
     }
+
+   
 }
