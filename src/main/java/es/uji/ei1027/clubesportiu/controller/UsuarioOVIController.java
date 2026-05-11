@@ -143,6 +143,66 @@ public class UsuarioOVIController {
         return "UsuarioOVI/dashboard";
     }
 
+    @GetMapping("/perfil")
+    public String perfil(HttpSession session, Model model) {
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
+
+        model.addAttribute("usuario", usuario);
+        return "UsuarioOVI/perfil";
+    }
+
+    @GetMapping("/editar")
+    public String editarPerfil(HttpSession session, Model model) {
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
+
+        model.addAttribute("usuario", usuario);
+        return "UsuarioOVI/editar";
+    }
+
+    @PostMapping("/editar")
+    public String guardarEdicion(@ModelAttribute UsuarioOVI usuario,
+                                HttpSession session) {
+
+        UsuarioOVI usuarioSesion =
+            (UsuarioOVI) session.getAttribute("usuarioLogueado");
+
+        if (usuarioSesion == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
+
+        usuario.setIdUsuario(usuarioSesion.getIdUsuario());
+        usuario.setEstadoAceptado(true);
+
+        usuarioOVIDao.updateUsuarioOVI(usuario);
+
+        session.setAttribute("usuarioLogueado", usuario);
+
+        return "redirect:/UsuarioOVI/perfil";
+    }
+
+    @GetMapping("/ver-candidatos")
+    public String verCandidatos(HttpSession session, Model model) {
+
+        UsuarioOVI usuario =
+            (UsuarioOVI) session.getAttribute("usuarioLogueado");
+
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
+
+        model.addAttribute("usuarios", usuarioOVIDao.getUsuariosOVI());
+
+        return "UsuarioOVI/ver-candidatos";
+    }
+
     @RequestMapping(value="/aceptar/{id}", method = RequestMethod.GET)
     public String aceptarUsuario(@PathVariable int id, HttpSession session) {
         TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
