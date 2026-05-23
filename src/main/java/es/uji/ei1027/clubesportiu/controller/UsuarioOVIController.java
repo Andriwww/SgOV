@@ -61,28 +61,27 @@ public class UsuarioOVIController {
         return "redirect:/UsuarioOVI/login";
     }
 
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable int id, Model model) {
-        model.addAttribute("usuario", usuarioOVIDao.getUsuarioOVI(id));
-        return "UsuarioOVI/edit";
-    }
-
-    @PostMapping("/edit")
-    public String editSubmit(@ModelAttribute UsuarioOVI usuario) {
-        usuarioOVIDao.updateUsuarioOVI(usuario);
-        return "redirect:/UsuarioOVI/list";
-    }
-
-    @GetMapping("/confirm-delete/{id}")
-    public String confirmDelete(@PathVariable int id, Model model) {
-        model.addAttribute("usuario", usuarioOVIDao.getUsuarioOVI(id));
+    @GetMapping("/delete")
+    public String confirmDeletePropioPerfil(HttpSession session, Model model) {
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
+        model.addAttribute("usuario", usuario);
         return "UsuarioOVI/delete";
     }
-    
 
     @PostMapping("/delete/{id}")
-    public String delete(@PathVariable int id) {
+    public String delete(@PathVariable int id, HttpSession session) {
+        UsuarioOVI usuarioSesion = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+
         usuarioOVIDao.deleteUsuarioOVI(id);
+
+        if (usuarioSesion != null && usuarioSesion.getIdUsuario() == id) {
+            session.invalidate();
+            return "redirect:/";
+        }
+
         return "redirect:/UsuarioOVI/list";
     }
 
@@ -155,7 +154,7 @@ public class UsuarioOVIController {
         return "UsuarioOVI/perfil";
     }
 
-    @GetMapping("/editar")
+    @GetMapping("/edit")
     public String editarPerfil(HttpSession session, Model model) {
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
 
@@ -164,25 +163,37 @@ public class UsuarioOVIController {
         }
 
         model.addAttribute("usuario", usuario);
-        return "UsuarioOVI/editar";
+        return "UsuarioOVI/edit";
     }
 
-    @PostMapping("/editar")
-    public String guardarEdicion(@ModelAttribute UsuarioOVI usuario,
-                                HttpSession session) {
+    @PostMapping("/edit")
+    public String guardarEdicion(@ModelAttribute("usuario") UsuarioOVI usuario,
+                                 BindingResult bindingResult,
+                                 HttpSession session) {
 
-        UsuarioOVI usuarioSesion =
-            (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        UsuarioOVI usuarioSesion = (UsuarioOVI) session.getAttribute("usuarioLogueado");
 
         if (usuarioSesion == null) {
             return "redirect:/UsuarioOVI/login";
         }
 
+        // 1. Reconstituimos los datos de sesión en el objeto enviado antes de validar
         usuario.setIdUsuario(usuarioSesion.getIdUsuario());
         usuario.setEstadoAceptado(true);
+        usuario.setConsentimientoRGBD(usuarioSesion.isConsentimientoRGBD());
+        usuario.setPassword(usuarioSesion.getPassword()); // Mantenemos la clave encriptada actual
 
+        // 2. Instanciamos y ejecutamos el validador
+        UsuarioOVIValidator validator = new UsuarioOVIValidator(usuarioOVIDao);
+        validator.validate(usuario, bindingResult);
+
+        // 3. Si hay errores (formato teléfono, email duplicado, etc.), volvemos al formulario
+        if (bindingResult.hasErrors()) {
+            return "UsuarioOVI/edit";
+        }
+
+        // 4. Si es válido, actualizamos base de datos y sesión
         usuarioOVIDao.updateUsuarioOVI(usuario);
-
         session.setAttribute("usuarioLogueado", usuario);
 
         return "redirect:/UsuarioOVI/perfil";

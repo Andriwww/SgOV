@@ -33,26 +33,34 @@ public class UsuarioOVIValidator implements Validator {
         } else if (!usuario.getEmail().contains("@")) {
             errors.rejectValue("email", "formato", "El email no es válido");
         } else {
+            // CAMBIO AQUÍ: Al editar, permitimos que coincida con su propio ID actual
             boolean emailRepetido = usuarioOVIDao.getUsuariosOVI().stream()
-                    .anyMatch(u -> u.getEmail().equalsIgnoreCase(usuario.getEmail()));
+                    .anyMatch(u -> u.getEmail().equalsIgnoreCase(usuario.getEmail()) 
+                            && u.getIdUsuario() != usuario.getIdUsuario());
             
             if (emailRepetido) {
                 errors.rejectValue("email", "repetido", "Este correo electrónico ya está registrado en el sistema");
             }
         }
 
-        if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
-            errors.rejectValue("password", "obligatorio", "La contraseña es obligatoria");
-        } else if (usuario.getPassword().length() < 6) {
-            errors.rejectValue("password", "longitud", "La contraseña debe tener al menos 6 caracteres");
+        // CAMBIO AQUÍ: La contraseña solo es obligatoria y se valida en el Registro (ID == 0)
+        if (usuario.getIdUsuario() == 0) {
+            if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
+                errors.rejectValue("password", "obligatorio", "La contraseña es obligatoria");
+            } else if (usuario.getPassword().length() < 6) {
+                errors.rejectValue("password", "longitud", "La contraseña debe tener al menos 6 caracteres");
+            }
         }
 
         if (usuario.getTelefono() != null && !usuario.getTelefono().trim().equals(""))
             if (!usuario.getTelefono().matches("^[0-9]{9}$"))
                 errors.rejectValue("telefono", "formato", "El teléfono debe tener 9 dígitos numéricos");
 
-        if (!usuario.isConsentimientoRGBD()) {
-            errors.rejectValue("consentimientoRGBD", "obligatorio", "Debe aceptar el tratamiento de protección de datos (RGBD) para registrarse");
+        // CAMBIO AQUÍ: El consentimiento RGBD solo se valida en el Registro (ID == 0)
+        if (usuario.getIdUsuario() == 0) {
+            if (!usuario.isConsentimientoRGBD()) {
+                errors.rejectValue("consentimientoRGBD", "obligatorio", "Debe aceptar el tratamiento de protección de datos (RGBD) para registrarse");
+            }
         }
     }
 }
