@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import es.uji.ei1027.clubesportiu.dao.RegistroContratoDao;
 import es.uji.ei1027.clubesportiu.dao.UsuarioOVIDao;
 import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UserDetails;
@@ -25,10 +26,16 @@ import jakarta.servlet.http.HttpSession;
 public class UsuarioOVIController {
 
     private UsuarioOVIDao usuarioOVIDao;
+    private RegistroContratoDao registroContratoDao;
 
     @Autowired
     public void setUsuarioOVIDao(UsuarioOVIDao usuarioOVIDao) {
         this.usuarioOVIDao = usuarioOVIDao;
+    }
+
+    @Autowired
+    public void setRegistroContratoDao(RegistroContratoDao registroContratoDao) {
+        this.registroContratoDao = registroContratoDao;
     }
 
     @RequestMapping("/list")
@@ -177,22 +184,18 @@ public class UsuarioOVIController {
             return "redirect:/UsuarioOVI/login";
         }
 
-        // 1. Reconstituimos los datos de sesión en el objeto enviado antes de validar
         usuario.setIdUsuario(usuarioSesion.getIdUsuario());
         usuario.setEstadoAceptado(true);
         usuario.setConsentimientoRGBD(usuarioSesion.isConsentimientoRGBD());
-        usuario.setPassword(usuarioSesion.getPassword()); // Mantenemos la clave encriptada actual
+        usuario.setPassword(usuarioSesion.getPassword());
 
-        // 2. Instanciamos y ejecutamos el validador
         UsuarioOVIValidator validator = new UsuarioOVIValidator(usuarioOVIDao);
         validator.validate(usuario, bindingResult);
 
-        // 3. Si hay errores (formato teléfono, email duplicado, etc.), volvemos al formulario
         if (bindingResult.hasErrors()) {
             return "UsuarioOVI/edit";
         }
 
-        // 4. Si es válido, actualizamos base de datos y sesión
         usuarioOVIDao.updateUsuarioOVI(usuario);
         session.setAttribute("usuarioLogueado", usuario);
 
@@ -231,5 +234,18 @@ public class UsuarioOVIController {
         }
 
         return "redirect:/UsuarioOVI/list";
+    }
+
+    @GetMapping("/contratos")
+    public String misContratos(HttpSession session, Model model) {
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
+
+        model.addAttribute("contratos", registroContratoDao.getContratosPorUsuario(usuario.getIdUsuario()));
+        model.addAttribute("nombreUsuario", usuario.getNombre());
+        
+        return "UsuarioOVI/contratos";
     }
 }
