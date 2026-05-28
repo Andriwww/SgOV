@@ -51,7 +51,7 @@ public class AsistentePersonalController {
         }
 
         asistentePersonalDao.addAsistentePersonal(asistente);
-        return "redirect:AsistentePersonal/esperaValidacion";
+        return "redirect:/AsistentePersonal/esperaValidacion/" + asistente.getIdAsistente(); // Redirige a la página de espera de validación
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -70,7 +70,7 @@ public class AsistentePersonalController {
             return "AsistentePersonal/login";
         }
 
-        return "redirect:/AsistentePersonal/perfil/" + asistenteBD.getIdAsistente();
+        return "redirect:/AsistentePersonal/esperaValidacion/" + asistenteBD.getIdAsistente();
     }
 
      // MOSTRAR PERFIL DEL ASISTENTE
@@ -100,13 +100,27 @@ public class AsistentePersonalController {
         }
 
         asistentePersonalDao.updateAsistentePersonal(asistente);
-        return "redirect:list";
+        return "redirect:main";
     }
 
     // ELIMINAR ASISTENTE
     @RequestMapping("/delete/{idAsistente}")
     public String delete(@PathVariable int idAsistente) {
         asistentePersonalDao.deleteAsistentePersonal(idAsistente);
-        return "redirect:../list";
+        return "redirect:/main";
+    }
+
+    @RequestMapping(value = "/esperaValidacion/{idAsistente}", method = RequestMethod.GET)
+    public String esperaValidacion(@PathVariable int idAsistente, Model model) {
+        AsistentePersonal asistente = asistentePersonalDao.getAsistentePersonal(idAsistente);
+        if (asistente == null) {
+            return "redirect:/AsistentePersonal/register";
+        }
+        if (asistente.isEstadoAceptado()) {
+            return "redirect:/main";
+        }
+
+        model.addAttribute("asistente", asistente);
+        return "AsistentePersonal/esperaValidacion";
     }
 }

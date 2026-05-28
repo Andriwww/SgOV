@@ -50,7 +50,7 @@
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4 p-md-5">
 
-                <form th:action="@{/AsistentePersonal/login}" th:object="${asistente}" method="post">
+                <form th:action="@{/AsistentePersonal/register}" th:object="${asistente}" method="post">
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -153,7 +153,7 @@
                         <button type="submit" class="btn btn-teal fw-bold px-4 py-2">
                             Solicitar Registro
                         </button>
-                        <a th:href="@{/AsistentePersonal/list}" class="btn btn-outline-secondary fw-bold px-4 py-2">
+                        <a th:href="@{/}" class="btn btn-outline-secondary fw-bold px-4 py-2">
                             Cancelar
                         </a>
                     </div>
