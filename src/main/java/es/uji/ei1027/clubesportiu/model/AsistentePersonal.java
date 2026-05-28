@@ -6,13 +6,15 @@ public class AsistentePersonal {
     private String nombre;
     private String apellidos;
     private String email;
+    private String contraseña; // Vinculado a th:field="*{contraseña}"
     private String telefono;
     private String disponibilidad;
     private boolean estadoAceptado;
     private boolean activo;
-    private String zona;
-    private String preferencias;
+    private String zona; // Vinculado a th:field="*{zona}" en update.html
+    private String preferencias; // Vinculado a th:field="*{preferencias}" en update.html
     private int puntuacion;
+    private boolean consentimientoRGBD; // Vinculado a th:field="*{consentimientoRGBD}"
 
     public AsistentePersonal() {
     }
@@ -47,6 +49,14 @@ public class AsistentePersonal {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getContraseña() {
+        return contraseña;
+    }
+
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
     }
 
     public String getTelefono() {
@@ -105,6 +115,14 @@ public class AsistentePersonal {
         this.puntuacion = puntuacion;
     }
 
+    public boolean isConsentimientoRGBD() {
+        return consentimientoRGBD;
+    }
+
+    public void setConsentimientoRGBD(boolean consentimientoRGBD) {
+        this.consentimientoRGBD = consentimientoRGBD;
+    }
+
     @Override
     public String toString() {
         return "AsistentePersonal{" +
@@ -112,12 +130,15 @@ public class AsistentePersonal {
                 ", nombre='" + nombre + '\'' +
                 ", apellidos='" + apellidos + '\'' +
                 ", email='" + email + '\'' +
+                ", contraseña='" + contraseña + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", disponibilidad='" + disponibilidad + '\'' +
                 ", estadoAceptado=" + estadoAceptado +
                 ", activo=" + activo +
+                ", zona='" + zona + '\'' +
+                ", preferencias='" + preferencias + '\'' +
+                ", puntuacion=" + puntuacion +
+                ", consentimientoRGBD=" + consentimientoRGBD +
                 '}';
     }
-
-   
 }

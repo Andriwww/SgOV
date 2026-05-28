@@ -22,43 +22,48 @@ public class AsistentePersonalDao {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    // INSERT
+    // INSERT: Guarda el registro completo proveniente de register.html
     public void addAsistentePersonal(AsistentePersonal asistente) {
-
         jdbcTemplate.update(
-            "INSERT INTO AsistentePersonal (nombre, apellidos, email, telefono, disponibilidad, estadoAceptado, activo) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO AsistentePersonal (nombre, apellidos, email, contraseña, telefono, disponibilidad, estadoAceptado, activo, zona, preferencias, puntuacion, consentimientoRGBD) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             asistente.getNombre(),
             asistente.getApellidos(),
             asistente.getEmail(),
+            asistente.getContraseña(),
             asistente.getTelefono(),
             asistente.getDisponibilidad(),
             asistente.isEstadoAceptado(),
-            asistente.isActivo()
+            asistente.isActivo(),
+            asistente.getZona(),
+            asistente.getPreferencias(),
+            asistente.getPuntuacion(),
+            asistente.isConsentimientoRGBD()
+        );
+    }
+
+    // UPDATE: Actualiza todos los parámetros del asistente (incluyendo los de update.html)
+    public void updateAsistentePersonal(AsistentePersonal asistente) {
+        jdbcTemplate.update(
+            "UPDATE AsistentePersonal SET nombre=?, apellidos=?, email=?, contraseña=?, telefono=?, disponibilidad=?, estadoAceptado=?, activo=?, zona=?, preferencias=?, puntuacion=?, consentimientoRGBD=? WHERE idAsistente=?",
+            asistente.getNombre(),
+            asistente.getApellidos(),
+            asistente.getEmail(),
+            asistente.getContraseña(),
+            asistente.getTelefono(),
+            asistente.getDisponibilidad(),
+            asistente.isEstadoAceptado(),
+            asistente.isActivo(),
+            asistente.getZona(),
+            asistente.getPreferencias(),
+            asistente.getPuntuacion(),
+            asistente.isConsentimientoRGBD(),
+            asistente.getIdAsistente()
         );
     }
 
     // DELETE
     public void deleteAsistentePersonal(int idAsistente) {
-        jdbcTemplate.update(
-                "DELETE FROM AsistentePersonal WHERE idAsistente = ?",
-                idAsistente
-        );
-    }
-
-    // UPDATE
-    public void updateAsistentePersonal(AsistentePersonal asistente) {
-
-        jdbcTemplate.update(
-                "UPDATE AsistentePersonal SET nombre=?, apellidos=?, email=?, telefono=?, disponibilidad=?, estadoAceptado=?, activo=? WHERE idAsistente=?",
-                asistente.getNombre(),
-                asistente.getApellidos(),
-                asistente.getEmail(),
-                asistente.getTelefono(),
-                asistente.getDisponibilidad(),
-                asistente.isEstadoAceptado(),
-                asistente.isActivo(),
-                asistente.getIdAsistente()
-        );
+        jdbcTemplate.update("DELETE FROM AsistentePersonal WHERE idAsistente=?", idAsistente);
     }
 
     // GET ONE
@@ -82,15 +87,26 @@ public class AsistentePersonalDao {
         );
     }
 
-    // SEARCH CANDIDATES
     public List<AsistentePersonal> buscarCompatibles(APRequest request) {
-
-    return jdbcTemplate.query(
-            "SELECT * FROM AsistentePersonal",
-            new AsistentePersonalRowMapper()
-    );
+        return jdbcTemplate.query(
+                "SELECT * FROM AsistentePersonal",
+                new AsistentePersonalRowMapper()
+        );
     }
 
+    public AsistentePersonal getAsistentePersonalByEmail(String email) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    "SELECT * FROM AsistentePersonal WHERE email=?",
+                    new AsistentePersonalRowMapper(),
+                    email
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    // Comprueba si el email ya existe en otro registro diferente al actual
     public boolean existeEmail(String email, int idAsistente) {
         Integer count = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM AsistentePersonal WHERE email = ? AND idAsistente != ?",

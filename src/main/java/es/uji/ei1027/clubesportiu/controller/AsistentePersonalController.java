@@ -16,6 +16,7 @@ import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
 @Controller
 @RequestMapping("/AsistentePersonal")
 public class AsistentePersonalController {
+
     private AsistentePersonalDao asistentePersonalDao;
 
     @Autowired
@@ -23,44 +24,70 @@ public class AsistentePersonalController {
         this.asistentePersonalDao = dao;
     }
 
-    // LIST
+    // LISTAR ASISTENTES
     @RequestMapping("/list")
     public String list(Model model) {
         model.addAttribute("asistentes", asistentePersonalDao.getAsistentesPersonales());
         return "AsistentePersonal/list";
     }
 
-    // ADD FORM
-    @RequestMapping("/login")
-    public String login() {
-        return "AsistentePersonal/login";
+    // MOSTRAR FORMULARIO DE ALTA / SOLICITUD (GET)
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String register(Model model) {
+        model.addAttribute("asistente", new AsistentePersonal());
+        return "AsistentePersonal/register"; // Renderiza el archivo register.html
     }
 
-    // ADD SUBMIT
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String addSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
-                            BindingResult result) {
+    // PROCESAR FORMULARIO DE ALTA / SOLICITUD (POST)
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String registerSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
+                                BindingResult result) {
 
         AsistentePersonalValidator validator = new AsistentePersonalValidator(asistentePersonalDao);
         validator.validate(asistente, result);
 
         if (result.hasErrors()) {
-            return "AsistentePersonal/login";
+            return "AsistentePersonal/register"; // Si falla, recarga register.html mostrando los mensajes de error
         }
 
         asistentePersonalDao.addAsistentePersonal(asistente);
-        return "redirect:list";
+        return "redirect:AsistentePersonal/esperaValidacion";
     }
 
-    // UPDATE FORM
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String login(Model model) {
+        model.addAttribute("asistente", new AsistentePersonal());
+        return "AsistentePersonal/login";
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String loginSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
+                              BindingResult result) {
+        AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(asistente.getEmail());
+
+        if (asistenteBD == null || !asistenteBD.getContraseña().equals(asistente.getContraseña())) {
+            result.rejectValue("email", "invalid", "Correo electrónico o contraseña incorrectos");
+            return "AsistentePersonal/login";
+        }
+
+        return "redirect:/AsistentePersonal/perfil/" + asistenteBD.getIdAsistente();
+    }
+
+     // MOSTRAR PERFIL DEL ASISTENTE
+     @RequestMapping("/perfil/{idAsistente}")
+     public String perfil(Model model, @PathVariable int idAsistente) {
+         model.addAttribute("asistente", asistentePersonalDao.getAsistentePersonal(idAsistente));
+         return "AsistentePersonal/perfil"; // Renderiza el archivo perfil.html
+     }
+
+    // MOSTRAR FORMULARIO DE EDICIÓN DE PERFIL (GET)
     @RequestMapping("/update/{idAsistente}")
     public String editForm(Model model, @PathVariable int idAsistente) {
-        model.addAttribute("asistente",
-                asistentePersonalDao.getAsistentePersonal(idAsistente));
-        return "AsistentePersonal/update";
+        model.addAttribute("asistente", asistentePersonalDao.getAsistentePersonal(idAsistente));
+        return "AsistentePersonal/update"; // Renderiza el archivo update.html
     }
 
-    // UPDATE SUBMIT
+    // PROCESAR FORMULARIO DE EDICIÓN DE PERFIL (POST)
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String editSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
                              BindingResult result) {
@@ -69,19 +96,17 @@ public class AsistentePersonalController {
         validator.validate(asistente, result);
 
         if (result.hasErrors()) {
-            return "AsistentePersonal/update";
+            return "AsistentePersonal/update"; // Si falla la edición, recarga update.html reteniendo los campos erróneos
         }
 
         asistentePersonalDao.updateAsistentePersonal(asistente);
         return "redirect:list";
     }
 
-
-    // DELETE
+    // ELIMINAR ASISTENTE
     @RequestMapping("/delete/{idAsistente}")
     public String delete(@PathVariable int idAsistente) {
         asistentePersonalDao.deleteAsistentePersonal(idAsistente);
-        return "redirect:/AsistentePersonal/list";
+        return "redirect:../list";
     }
-    
 }
