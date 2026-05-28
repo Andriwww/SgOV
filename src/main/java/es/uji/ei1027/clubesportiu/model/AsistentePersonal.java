@@ -1,7 +1,5 @@
 package es.uji.ei1027.clubesportiu.model;
 
-import java.util.List;
-
 public class AsistentePersonal {
 
     private int idAsistente;

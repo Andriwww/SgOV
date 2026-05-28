@@ -15,7 +15,7 @@
 
 <main class="container py-4">
 
-    <h1 class="mb-4">Modificar Asistente</h1>
+    <h1 class="mb-4">Modificar Perfil Asistente</h1>
 
     <form th:action="@{/AsistentePersonal/update}"
           th:object="${asistente}"
@@ -64,16 +64,6 @@
             <input type="text" th:field="*{disponibilidad}"
                    class="form-control"
                    th:errorclass="needcorrection" />
-        </div>
-
-        <div class="form-check">
-            <input type="checkbox" th:field="*{estadoAceptado}" />
-            <label>Estado aceptado</label>
-        </div>
-
-        <div class="form-check mb-3">
-            <input type="checkbox" th:field="*{activo}" />
-            <label>Activo</label>
         </div>
 
         <button class="btn btn-primary">Guardar</button>

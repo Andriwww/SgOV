@@ -1,16 +1,17 @@
 package es.uji.ei1027.clubesportiu.controller;
 
-import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
-import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
-import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
+import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
+import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
 
 @Controller
 @RequestMapping("/AsistentePersonal")
@@ -40,7 +41,7 @@ public class AsistentePersonalController {
     public String addSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
                             BindingResult result) {
 
-        AsistentePersonalValidator validator = new AsistentePersonalValidator();
+        AsistentePersonalValidator validator = new AsistentePersonalValidator(asistentePersonalDao);
         validator.validate(asistente, result);
 
         if (result.hasErrors()) {
@@ -64,7 +65,7 @@ public class AsistentePersonalController {
     public String editSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
                              BindingResult result) {
 
-        AsistentePersonalValidator validator = new AsistentePersonalValidator();
+        AsistentePersonalValidator validator = new AsistentePersonalValidator(asistentePersonalDao);
         validator.validate(asistente, result);
 
         if (result.hasErrors()) {

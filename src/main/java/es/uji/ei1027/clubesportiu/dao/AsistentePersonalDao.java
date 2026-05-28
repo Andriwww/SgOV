@@ -1,14 +1,16 @@
 package es.uji.ei1027.clubesportiu.dao;
 
-import es.uji.ei1027.clubesportiu.model.APRequest;
-import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.util.List;
+import es.uji.ei1027.clubesportiu.model.APRequest;
+import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 
 @Repository
 public class AsistentePersonalDao {
@@ -87,5 +89,15 @@ public class AsistentePersonalDao {
             "SELECT * FROM AsistentePersonal",
             new AsistentePersonalRowMapper()
     );
-}
+    }
+
+    public boolean existeEmail(String email, int idAsistente) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM AsistentePersonal WHERE email = ? AND idAsistente != ?",
+                Integer.class,
+                email,
+                idAsistente
+        );
+        return count != null && count > 0;
+    }
 }

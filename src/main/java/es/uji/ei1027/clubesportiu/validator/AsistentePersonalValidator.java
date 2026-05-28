@@ -1,10 +1,21 @@
 package es.uji.ei1027.clubesportiu.validator;
 
-import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
+import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
+
+
+
 public class AsistentePersonalValidator implements Validator{
+
+    private final AsistentePersonalDao asistentePersonalDao;
+
+    public AsistentePersonalValidator(AsistentePersonalDao asistentePersonalDao)
+    {
+        this.asistentePersonalDao = asistentePersonalDao; 
+    }
     @Override
     public boolean supports(Class<?> cls) {
         return AsistentePersonal.class.equals(cls);
@@ -28,7 +39,9 @@ public class AsistentePersonalValidator implements Validator{
         if (asistente.getEmail() == null || asistente.getEmail().trim().isEmpty()) {
             errors.rejectValue("email", "obligatorio", "El email es obligatorio");
         } else if (!asistente.getEmail().contains("@")) {
-            errors.rejectValue("email", "formato", "El email no es válido");
+          errors.rejectValue("email", "formato", "El email no es válido");
+        }else if (asistentePersonalDao.existeEmail(asistente.getEmail(), asistente.getIdAsistente())) {
+            errors.rejectValue("email", "repetido", "Este correo electrónico ya está registrado en el sistema");
         }
 
         // teléfono opcional pero si existe → 9 dígitos
