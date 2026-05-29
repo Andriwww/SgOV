@@ -3,92 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SgOVI - Validación de Asistentes</title>
+    <title>SgOVI - Mis Solicitudes de Asistencia</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/asistentePersonal.css}" />
     <style>
         .text-teal { color: #0d9488 !important; }
+        .bg-teal { background-color: #0d9488 !important; }
         .btn-teal { background-color: #0d9488 !important; color: white !important; border: none; }
         .btn-teal:hover { background-color: #0f766e !important; color: white !important; }
         .btn-outline-teal { color: #0d9488 !important; border-color: #0d9488 !important; }
         .btn-outline-teal:hover { color: #fff !important; background-color: #0d9488 !important; border-color: #0d9488 !important; }
+        .badge-pendiente { background-color: #f59e0b; color: white; }
+        .badge-aceptada { background-color: #10b981; color: white; }
+        .badge-rechazada { background-color: #ef4444; color: white; }
     </style>
 </head>
 <body class="bg-light">
 
+    <!-- BARRA DE NAVEGACIÓN PROPIA DEL ASISTENTE -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
         <div class="container">
-            <a class="navbar-brand text-teal fw-bold" th:href="@{/AsistentePersonal/list}">
-                SgOVI - Panel de Administración
-            </a>
-            <div class="d-flex align-items-center">
-                <a th:href="@{/AsistentePersonal/list}" class="btn btn-outline-secondary btn-sm fw-bold me-2">
-                    ← Volver al Listado
-                </a>
+            <a class="navbar-brand text-teal fw-bold" th:href="@{/AsistentePersonal/main}">SgOVI - Portal Asistente</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/AsistentePersonal/main}">Mi Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-bold text-teal" th:href="@{/APRequest/mis-solicitudes}">Mis Solicitudes Asignadas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" th:href="@{/logout}">Cerrar Sesión</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="text-teal fw-bold mb-0">Asistentes Pendientes de Validación</h2>
-                <p class="text-muted m-0 small">Revisa y aprueba las solicitudes de registro de los nuevos Asistentes Personales.</p>
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container my-5">
+        
+        <!-- BIENVENIDA E INFORMACIÓN DEL ASISTENTE LOGUEADO -->
+        <div class="card shadow-sm border-0 rounded-3 mb-4 bg-teal text-white">
+            <div class="card-body p-4">
+                <h4 class="m-0">¡Hola, <span th:text="${session.usuarioLogueado.nombre} + ' ' + ${session.usuarioLogueado.apellidos}">Asistente</span>!</h4>
+                <p class="m-0 text-white-50 small">Aquí puedes ver el historial y control de las solicitudes de asistencia (APRequest) que te han sido dirigidas o asignadas.</p>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-            <div class="table-responsive">
-                <table class="table table-align-middle mb-0">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-4">
+                
+                <h3 class="text-teal fw-bold mb-4">📋 Solicitudes Dirigidas a Mí</h3>
+
+                <!-- TABLA DE SOLICITUDES ESPECÍFICAS -->
+                <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4 py-3">ID / Registro</th>
-                            <th class="py-3">Asistente Personal</th>
-                            <th class="py-3">Contacto</th>
-                            <th class="py-3">Zona de Trabajo</th>
-                            <th class="text-center pe-4 py-3">Acciones / Gestión</th>
+                            <th scope="col" style="width: 10%;">ID Solicitud</th>
+                            <th scope="col" style="width: 15%;">Fecha Requerida</th>
+                            <th scope="col">Descripción del Servicio</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Estado Petición</th>
+                            <th scope="col" style="width: 20%;" class="text-center">Acción Técnica</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="asistente : ${asistentes}">
-                            <td class="ps-4 py-3">
-                                <span class="d-block fw-bold text-dark" th:text="${'ID: ' + asistente.idAsistente}"></span>
-                                <small class="text-muted d-block">Pendiente de activar</small>
-                            </td>
+                        <!-- Iteramos sobre las solicitudes enviadas filtradas para este asistente -->
+                        <tr th:each="solicitud : ${solicitudesAsistente}">
+                            <td class="fw-bold text-secondary" th:text="${solicitud.idRequest}">1</td>
+                            <td th:text="${#temporals.format(solicitud.fechaSolicitud, 'dd/MM/yyyy')}">12/06/2026</td>
                             <td>
-                                <span class="fw-semibold text-dark d-block" th:text="${asistente.nombre + ' ' + asistente.apellidos}"></span>
-                                <span class="badge bg-secondary text-white fw-bold btn-sm" style="font-size: 0.75rem;">Candidato AP</span>
+                                <div class="text-dark text-wrap" th:text="${solicitud.descripcion}">
+                                    Acompañamiento matutino para clases en la UJI y asistencia en biblioteca.
+                                </div>
                             </td>
-                            <td>
-                                <span class="d-block small" th:text="${asistente.email}"></span>
-                                <small class="text-muted" th:text="${asistente.telefono != null ? asistente.telefono : 'Sin teléfono'}"></small>
+                            <td class="text-center">
+                                <!-- Estados de la APRequest -->
+                                <span th:if="${solicitud.estado.name() == 'PENDIENTE'}" class="badge badge-pendiente px-2 py-1.5 rounded-pill small fw-bold">⏳ Pendiente</span>
+                                <span th:if="${solicitud.estado.name() == 'ACEPTADA'}" class="badge badge-aceptada px-2 py-1.5 rounded-pill small fw-bold">✓ Aceptada</span>
+                                <span th:if="${solicitud.estado.name() == 'RECHAZADA'}" class="badge badge-rechazada px-2 py-1.5 rounded-pill small fw-bold">✕ Rechazada</span>
                             </td>
-                            <td>
-                                <span class="fw-bold text-teal" th:text="${asistente.zona != null ? asistente.zona : 'No especificada'}"></span>
-                            </td>
-                            <td class="text-center pe-4">
-                                <div class="d-inline-flex gap-2">
-                                    <a th:href="@{/AsistentePersonal/aceptar/{id}(id=${asistente.idAsistente})}" 
-                                       class="btn btn-teal btn-sm fw-bold px-3">
-                                        ✓ Admitir en el Sistema
+                            <td class="text-center">
+                                <!-- Acciones condicionadas al estado actual de la petición -->
+                                <div th:if="${solicitud.estado.name() == 'PENDIENTE'}" class="d-flex gap-2 justify-content-center">
+                                    <a th:href="@{/APRequest/responder/{id}/ACEPTADA(id=${solicitud.idRequest})}" 
+                                       class="btn btn-teal btn-sm fw-bold px-2">
+                                        ✓ Aceptar
                                     </a>
-                                    <a th:href="@{/AsistentePersonal/delete/{id}(id=${asistente.idAsistente})}" 
-                                       class="btn btn-outline-danger btn-sm fw-bold px-3"
-                                       onclick="return confirm('¿Estás seguro de que deseas rechazar y eliminar esta solicitud de registro?');">
+                                    <a th:href="@{/APRequest/responder/{id}/RECHAZADA(id=${solicitud.idRequest})}" 
+                                       class="btn btn-outline-danger btn-sm fw-bold px-2"
+                                       onclick="return confirm('¿Seguro que quieres rechazar esta asignación?');">
                                         ✕ Rechazar
                                     </a>
                                 </div>
+                                <div th:if="${solicitud.estado.name() == 'ACEPTADA'}">
+                                    <a th:href="@{/chat/sala/{id}(id=${solicitud.idRequest})}" class="btn btn-outline-teal btn-sm fw-bold w-100">
+                                        💬 Chat de Coordinación
+                                    </a>
+                                </div>
+                                <span th:if="${solicitud.estado.name() == 'RECHAZADA'}" class="text-muted small italic">
+                                    Descartada por ti
+                                </span>
                             </td>
                         </tr>
                         
-                        <tr th:if="${#lists.isEmpty(asistentes)}">
+                        <!-- Si el asistente no tiene ninguna solicitud dirigida -->
+                        <tr th:if="${#lists.isEmpty(solicitudesAsistente)}">
                             <td colspan="5" class="text-center py-5 text-muted">
-                                <div class="fs-4 mb-2">🎉</div>
-                                No hay solicitudes de registro pendientes de validación en este momento.
+                                <div class="fs-4 mb-2">📥</div>
+                                Actualmente no tienes ninguna solicitud de asistencia dirigida o asignada a tu perfil.
                             </td>
                         </tr>
                     </tbody>
                 </table>
+
             </div>
         </div>
     </main>

@@ -83,15 +83,12 @@
                                 </td>
                                 
                                 <td class="text-center pe-4">
-                                    <a th:if="${!asistente.estadoAceptado}" 
-                                       th:href="@{/TecnicoOVI/asistente/aceptar/{id}(id=${asistente.idAsistente})}"
-                                       class="btn btn-sm btn-success fw-bold px-3"
-                                       onclick="return confirm('¿Estás seguro de que deseas admitir y validar a este asistente en la Bolsa de Trabajo OVI?')">
-                                        ✓ Validar Acceso
+                                    <a  
+                                       th:href="@{/AsistentePersonal/rechazar/{id}(id=${asistente.idAsistente})}"
+                                       class="btn btn-sm btn-danger fw-bold px-3"
+                                       onclick="return confirm('¿Estás seguro de que deseas rechazar a este asistente en la Bolsa de Trabajo OVI?')">
+                                        ✗ Rechazar Acceso
                                     </a>
-                                    <span th:if="${asistente.estadoAceptado}" class="text-muted small italic">
-                                        Ya verificado
-                                    </span>
                                 </td>
                                 
                             </tr>

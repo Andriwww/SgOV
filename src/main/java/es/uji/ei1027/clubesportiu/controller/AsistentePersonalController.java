@@ -37,7 +37,7 @@ public class AsistentePersonalController {
     @RequestMapping("/list/pendientes")
     public String listPendientes(Model model) {
         model.addAttribute("asistentes", asistentePersonalDao.getAsistentesPersonalesPendientes());
-        return "AsistentePersonal/solicitudes";
+        return "AsistentePersonal/TecnicoSolicitudes";
     }
 
 
@@ -69,7 +69,7 @@ public class AsistentePersonalController {
     // PROCESAR FORMULARIO DE ALTA / SOLICITUD (POST)
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
-                                BindingResult result) {
+                                BindingResult result, HttpSession session) {
 
         AsistentePersonalValidator validator = new AsistentePersonalValidator(asistentePersonalDao);
         validator.validate(asistente, result);
@@ -85,7 +85,8 @@ public class AsistentePersonalController {
         asistente.setEstadoAceptado(false); // Por defecto, el asistente no está aceptado
 
         asistentePersonalDao.addAsistentePersonal(asistente);
-        return "redirect:/AsistentePersonal/login"; // Redirige a la página de espera de validación
+        session.setAttribute("asistenteLogueado", asistente); // Guardamos el asistente recién registrado en sesión
+        return "redirect:/AsistentePersonal/esperaValidacion"; // Redirige a la página de espera de validación
     }
 
 
@@ -138,7 +139,11 @@ public class AsistentePersonalController {
      @RequestMapping("/perfil")
      public String perfil(Model model, HttpSession session) {
          AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
-         model.addAttribute("asistente", asistente);
+            if (asistente == null) {
+                return "redirect:/AsistentePersonal/login"; // Si no hay asistente en sesión, redirige al login
+            }
+         AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(asistente.getEmail());
+         model.addAttribute("asistente", asistenteBD);
          return "AsistentePersonal/perfil"; // Renderiza el archivo perfil.html
      }
 
@@ -150,6 +155,9 @@ public class AsistentePersonalController {
     @RequestMapping("/update")
     public String editForm(Model model, HttpSession session) {
         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        if (asistente == null) {
+            return "redirect:/AsistentePersonal/login"; // Si no hay asistente en sesión, redirige al login
+        }
         model.addAttribute("asistente", asistente);
         return "AsistentePersonal/update"; // Renderiza el archivo update.html
     }
@@ -170,6 +178,13 @@ public class AsistentePersonalController {
             return "AsistentePersonal/update"; // Si falla la edición, recarga update.html reteniendo los campos erróneos
         }
 
+        AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(asistente.getEmail());
+        if (asistenteBD != null && !(asistenteBD.getIdAsistente() == asistente.getIdAsistente())) {
+            result.rejectValue("email", "duplicate", "El email ya está registrado por otro asistente");
+            return "AsistentePersonal/update";
+        }
+
+        asistente.setContraseña(asistenteBD.getContraseña()); // Mantenemos la contraseña actual sin cambios
         asistentePersonalDao.updateAsistentePersonal(asistente);
         return "redirect:main";
     }
@@ -203,8 +218,17 @@ public class AsistentePersonalController {
         return "redirect:/";
     }
 
+    @RequestMapping("/rechazar/{idAsistente}")
+    public String rechazar(@PathVariable int idAsistente) {
+        asistentePersonalDao.deleteAsistentePersonal(idAsistente);
+        return "redirect:/AsistentePersonal/list/pendientes";
+    }
 
-
+    @RequestMapping("/eliminar/{idAsistente}")
+    public String eliminar(@PathVariable int idAsistente) {
+        asistentePersonalDao.deleteAsistentePersonal(idAsistente);
+        return "redirect:/AsistentePersonal/list";
+    }
 
 
     @RequestMapping(value = "/esperaValidacion", method = RequestMethod.GET)
@@ -228,5 +252,21 @@ public class AsistentePersonalController {
         
         // Si sigue sin estar aceptado, se queda en la pantalla de espera
         return "AsistentePersonal/esperaValidacion"; 
+    }
+
+    @RequestMapping("/solicitudes")
+    public String verSolicitudes(HttpSession session, Model model) {
+
+        // 1. COMPROBAR SI HAY ALGUIEN LOGUEADO
+        AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        
+        if (asistente == null) {
+            // Si es nulo, lo echamos al login para que no falle la plantilla HTML
+            return "redirect:/AsistentePersonal/login"; 
+        }
+
+        // 2. Si todo va bien, cargar la lista y devolver la vista
+        // ... tu código ...
+        return "AsistentePersonal/solicitudes";
     }
 }
