@@ -23,7 +23,7 @@
     <!-- BARRA DE NAVEGACIÓN PROPIA DEL ASISTENTE -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
         <div class="container">
-            <a class="navbar-brand text-teal fw-bold" th:href="@{/AsistentePersonal/main}">SgOVI - Portal Asistente</a>
+            <a class="navbar-brand text-teal fw-bold" th:href="@{/AsistentePersonal/main}">SgOVI - Área Profesional</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -32,9 +32,7 @@
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/AsistentePersonal/main}">Mi Perfil</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active fw-bold text-teal" th:href="@{/APRequest/mis-solicitudes}">Mis Solicitudes Asignadas</a>
-                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link text-danger" th:href="@{/logout}">Cerrar Sesión</a>
                     </li>
@@ -49,7 +47,7 @@
         <!-- BIENVENIDA E INFORMACIÓN DEL ASISTENTE LOGUEADO -->
         <div class="card shadow-sm border-0 rounded-3 mb-4 bg-teal text-white">
             <div class="card-body p-4">
-                <h4 class="m-0">¡Hola, <span th:text="${session.usuarioLogueado.nombre} + ' ' + ${session.usuarioLogueado.apellidos}">Asistente</span>!</h4>
+                <h4 class="m-0">¡Hola, <span th:text="${session.asistenteLogueado.nombre} + ' ' + ${session.asistenteLogueado.apellidos}">Asistente</span>!</h4>
                 <p class="m-0 text-white-50 small">Aquí puedes ver el historial y control de las solicitudes de asistencia (APRequest) que te han sido dirigidas o asignadas.</p>
             </div>
         </div>
@@ -82,9 +80,9 @@
                             </td>
                             <td class="text-center">
                                 <!-- Estados de la APRequest -->
-                                <span th:if="${solicitud.estado.name() == 'PENDIENTE'}" class="badge badge-pendiente px-2 py-1.5 rounded-pill small fw-bold">⏳ Pendiente</span>
-                                <span th:if="${solicitud.estado.name() == 'ACEPTADA'}" class="badge badge-aceptada px-2 py-1.5 rounded-pill small fw-bold">✓ Aceptada</span>
-                                <span th:if="${solicitud.estado.name() == 'RECHAZADA'}" class="badge badge-rechazada px-2 py-1.5 rounded-pill small fw-bold">✕ Rechazada</span>
+                                <span th:if="${solicitud.estado.name() == 'pendiente'}" class="badge badge-pendiente px-2 py-1.5 rounded-pill small fw-bold">⏳ Pendiente</span>
+                                <span th:if="${solicitud.estado.name() == 'aprobada'}" class="badge badge-aceptada px-2 py-1.5 rounded-pill small fw-bold">✓ Aceptada</span>
+                                <span th:if="${solicitud.estado.name() == 'rechazada'}" class="badge badge-rechazada px-2 py-1.5 rounded-pill small fw-bold">✕ Rechazada</span>
                             </td>
                             <td class="text-center">
                                 <!-- Acciones condicionadas al estado actual de la petición -->
@@ -99,12 +97,12 @@
                                         ✕ Rechazar
                                     </a>
                                 </div>
-                                <div th:if="${solicitud.estado.name() == 'ACEPTADA'}">
+                                <div th:if="${solicitud.estado.name() == 'aprobada'}">
                                     <a th:href="@{/chat/sala/{id}(id=${solicitud.idRequest})}" class="btn btn-outline-teal btn-sm fw-bold w-100">
                                         💬 Chat de Coordinación
                                     </a>
                                 </div>
-                                <span th:if="${solicitud.estado.name() == 'RECHAZADA'}" class="text-muted small italic">
+                                <span th:if="${solicitud.estado.name() == 'rechazada'}" class="text-muted small italic">
                                     Descartada por ti
                                 </span>
                             </td>

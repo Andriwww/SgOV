@@ -98,4 +98,15 @@ public class APRequestDao {
                 idUsuario
         );
     }
+
+    // Añadir a: es.uji.ei1027.clubesportiu.dao.APRequestDao
+
+   public List<APRequest> getAPRequestsByAsistente(int idAsistente) {
+        // 💡 Cambiamos s.idrequest por s.idseleccion (o el nombre exacto de la columna en tu tabla seleccion que enlaza con aprequest)
+        String sql = "SELECT r.* FROM aprequest r " +
+                    "JOIN seleccion s ON r.idrequest = s.idseleccion " + 
+                    "WHERE s.idasistente = ?";
+                    
+        return jdbcTemplate.query(sql, new APRequestRowMapper(), idAsistente);
+    }
 }

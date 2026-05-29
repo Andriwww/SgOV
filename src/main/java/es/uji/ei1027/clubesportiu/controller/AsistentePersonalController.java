@@ -1,5 +1,7 @@
 package es.uji.ei1027.clubesportiu.controller;
 
+import java.util.List;
+
 import org.jasypt.util.password.BasicPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
+import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
 import jakarta.servlet.http.HttpSession;
@@ -20,10 +23,16 @@ import jakarta.servlet.http.HttpSession;
 public class AsistentePersonalController {
 
     private AsistentePersonalDao asistentePersonalDao;
+    private es.uji.ei1027.clubesportiu.dao.APRequestDao apRequestDao;
 
     @Autowired
     public void setAsistentePersonalDao(AsistentePersonalDao dao) {
         this.asistentePersonalDao = dao;
+    }
+
+    @Autowired
+    public void setAPRequestDao(es.uji.ei1027.clubesportiu.dao.APRequestDao dao) {
+        this.apRequestDao = dao;
     }
 
     // LISTAR ASISTENTES
@@ -254,19 +263,55 @@ public class AsistentePersonalController {
         return "AsistentePersonal/esperaValidacion"; 
     }
 
-    @RequestMapping("/solicitudes")
-    public String verSolicitudes(HttpSession session, Model model) {
-
-        // 1. COMPROBAR SI HAY ALGUIEN LOGUEADO
+    // 1. VISUALIZACIÓN DE SOLICITUDES
+    @RequestMapping(value = "/solicitudes", method = RequestMethod.GET)
+    public String misSolicitudes(HttpSession session, Model model) {
+        // Control de seguridad: Verificar sesión activa del asistente
         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
-        
         if (asistente == null) {
-            // Si es nulo, lo echamos al login para que no falle la plantilla HTML
-            return "redirect:/AsistentePersonal/login"; 
+            return "redirect:/AsistentePersonal/login";
         }
 
-        // 2. Si todo va bien, cargar la lista y devolver la vista
-        // ... tu código ...
+        // Obtener las solicitudes asignadas a este asistente cruzando con la tabla Selección
+        List<APRequest> solicitudes = apRequestDao.getAPRequestsByAsistente(asistente.getIdAsistente());
+
+        // Pasamos la variable con el nombre exacto que requiere el HTML: "solicitudesAsistente"
+        model.addAttribute("solicitudesAsistente", solicitudes);
+
         return "AsistentePersonal/solicitudes";
+    }
+
+    // 2. ACCIÓN DE ACEPTAR LA SOLICITUD
+    @RequestMapping(value = "/solicitudes/aceptar/{id}", method = RequestMethod.GET)
+    public String aceptarSolicitud(@PathVariable("id") int idRequest, HttpSession session) {
+        AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        if (asistente == null) {
+            return "redirect:/AsistentePersonal/login";
+        }
+
+        APRequest request = apRequestDao.getAPRequest(idRequest);
+        if (request != null) {
+            request.setEstado(es.uji.ei1027.clubesportiu.model.Estado.aprobada); // Cambia al Enum en mayúsculas
+            apRequestDao.updateEstadoAPRequest(request);
+        }
+
+        return "redirect:/AsistentePersonal/solicitudes";
+    }
+
+    // 3. ACCIÓN DE RECHAZAR LA SOLICITUD
+    @RequestMapping(value = "/solicitudes/rechazar/{id}", method = RequestMethod.GET)
+    public String rechazarSolicitud(@PathVariable("id") int idRequest, HttpSession session) {
+        AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        if (asistente == null) {
+            return "redirect:/AsistentePersonal/login";
+        }
+
+        APRequest request = apRequestDao.getAPRequest(idRequest);
+        if (request != null) {
+            request.setEstado(es.uji.ei1027.clubesportiu.model.Estado.rechazada); 
+            apRequestDao.updateEstadoAPRequest(request);
+        }
+
+        return "redirect:/AsistentePersonal/solicitudes";
     }
 }
