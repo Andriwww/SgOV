@@ -1,5 +1,6 @@
 package es.uji.ei1027.clubesportiu.controller;
 
+import org.jasypt.util.password.BasicPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/AsistentePersonal")
@@ -31,12 +33,38 @@ public class AsistentePersonalController {
         return "AsistentePersonal/list";
     }
 
+
+    @RequestMapping("/list/pendientes")
+    public String listPendientes(Model model) {
+        model.addAttribute("asistentes", asistentePersonalDao.getAsistentesPersonalesPendientes());
+        return "AsistentePersonal/solicitudes";
+    }
+
+
+
+    @RequestMapping("/main")
+    public String main(HttpSession session, Model model) {
+        AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        if (asistente == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("asistente", asistente);
+        return "AsistentePersonal/main";
+    }
+
+
+
+
     // MOSTRAR FORMULARIO DE ALTA / SOLICITUD (GET)
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String register(Model model) {
         model.addAttribute("asistente", new AsistentePersonal());
         return "AsistentePersonal/register"; // Renderiza el archivo register.html
     }
+
+
+
+
 
     // PROCESAR FORMULARIO DE ALTA / SOLICITUD (POST)
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -50,42 +78,85 @@ public class AsistentePersonalController {
             return "AsistentePersonal/register"; // Si falla, recarga register.html mostrando los mensajes de error
         }
 
+        BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
+        String passEncriptada = passwordEncryptor.encryptPassword(asistente.getContraseña());
+    
+        asistente.setContraseña(passEncriptada);
+        asistente.setEstadoAceptado(false); // Por defecto, el asistente no está aceptado
+
         asistentePersonalDao.addAsistentePersonal(asistente);
-        return "redirect:/AsistentePersonal/esperaValidacion/" + asistente.getIdAsistente(); // Redirige a la página de espera de validación
+        return "redirect:/AsistentePersonal/login"; // Redirige a la página de espera de validación
     }
 
+
+
+
+
+
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(Model model) {
-        model.addAttribute("asistente", new AsistentePersonal());
+    public String login(Model Model) {
+        Model.addAttribute("asistente", new AsistentePersonal());
         return "AsistentePersonal/login";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String loginSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
-                              BindingResult result) {
-        AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(asistente.getEmail());
 
-        if (asistenteBD == null || !asistenteBD.getContraseña().equals(asistente.getContraseña())) {
-            result.rejectValue("email", "invalid", "Correo electrónico o contraseña incorrectos");
+
+
+
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String loginSubmit(@ModelAttribute("asistente") AsistentePersonal usuario,
+                              BindingResult result, HttpSession session, Model model) {
+
+        if (result.hasErrors()) {
             return "AsistentePersonal/login";
         }
 
-        return "redirect:/AsistentePersonal/esperaValidacion/" + asistenteBD.getIdAsistente();
+        AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(usuario.getEmail());
+
+        if (asistenteBD == null) {
+            result.rejectValue("asistente", "invalid", "Credenciales incorrectas");
+            return "AsistentePersonal/login";
+        }
+
+        BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
+        if (!passwordEncryptor.checkPassword(usuario.getContraseña(), asistenteBD.getContraseña())) {
+            model.addAttribute("error", "Credenciales incorrectas");
+            return "AsistentePersonal/login";
+        }
+
+        session.removeAttribute("error");
+        session.setAttribute("asistenteLogueado", asistenteBD);
+        return "redirect:/AsistentePersonal/esperaValidacion";
     }
 
+
+
+
+
      // MOSTRAR PERFIL DEL ASISTENTE
-     @RequestMapping("/perfil/{idAsistente}")
-     public String perfil(Model model, @PathVariable int idAsistente) {
-         model.addAttribute("asistente", asistentePersonalDao.getAsistentePersonal(idAsistente));
+     @RequestMapping("/perfil")
+     public String perfil(Model model, HttpSession session) {
+         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+         model.addAttribute("asistente", asistente);
          return "AsistentePersonal/perfil"; // Renderiza el archivo perfil.html
      }
 
+
+
+
+
     // MOSTRAR FORMULARIO DE EDICIÓN DE PERFIL (GET)
-    @RequestMapping("/update/{idAsistente}")
-    public String editForm(Model model, @PathVariable int idAsistente) {
-        model.addAttribute("asistente", asistentePersonalDao.getAsistentePersonal(idAsistente));
+    @RequestMapping("/update")
+    public String editForm(Model model, HttpSession session) {
+        AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        model.addAttribute("asistente", asistente);
         return "AsistentePersonal/update"; // Renderiza el archivo update.html
     }
+
+
+
+
 
     // PROCESAR FORMULARIO DE EDICIÓN DE PERFIL (POST)
     @RequestMapping(value = "/update", method = RequestMethod.POST)
@@ -103,24 +174,59 @@ public class AsistentePersonalController {
         return "redirect:main";
     }
 
+
+
+
+
+
     // ELIMINAR ASISTENTE
     @RequestMapping("/delete/{idAsistente}")
     public String delete(@PathVariable int idAsistente) {
         asistentePersonalDao.deleteAsistentePersonal(idAsistente);
-        return "redirect:/main";
+        return "redirect:/";
     }
 
-    @RequestMapping(value = "/esperaValidacion/{idAsistente}", method = RequestMethod.GET)
-    public String esperaValidacion(@PathVariable int idAsistente, Model model) {
-        AsistentePersonal asistente = asistentePersonalDao.getAsistentePersonal(idAsistente);
-        if (asistente == null) {
-            return "redirect:/AsistentePersonal/register";
-        }
-        if (asistente.isEstadoAceptado()) {
-            return "redirect:/main";
-        }
 
-        model.addAttribute("asistente", asistente);
-        return "AsistentePersonal/esperaValidacion";
+
+
+    @RequestMapping("/aceptar/{idAsistente}")
+    public String aceptar(@PathVariable int idAsistente) {
+        AsistentePersonal asistente = asistentePersonalDao.getAsistentePersonal(idAsistente);
+        asistente.setEstadoAceptado(true);
+        asistentePersonalDao.updateAsistentePersonal(asistente);
+        return "redirect:/AsistentePersonal/list/pendientes";
+    }
+
+    @RequestMapping("logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
+
+
+
+
+
+    @RequestMapping(value = "/esperaValidacion", method = RequestMethod.GET)
+    public String esperaValidacion(HttpSession session, Model model) {
+        AsistentePersonal asistenteSesion = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        if (asistenteSesion == null) {
+            return "redirect:/AsistentePersonal/login";
+        }
+        
+        // 2. CORRECCIÓN: Consultar los datos actualizados directamente al DAO (Base de datos)
+        AsistentePersonal asistenteReal = asistentePersonalDao.getAsistentePersonalByEmail(asistenteSesion.getEmail());
+        
+        // 3. Comprobamos el estado del objeto recién traído de la base de datos
+        if (asistenteReal != null && asistenteReal.isEstadoAceptado()) {
+            // Opcional pero recomendado: Actualizamos la sesión con el nuevo estado del usuario
+            session.setAttribute("asistenteLogueado", asistenteReal);
+            
+            // Redirigimos al menú principal
+            return "redirect:/AsistentePersonal/main"; 
+        }
+        
+        // Si sigue sin estar aceptado, se queda en la pantalla de espera
+        return "AsistentePersonal/esperaValidacion"; 
     }
 }

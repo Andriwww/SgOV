@@ -32,7 +32,7 @@
                 SgOVI - Área Profesional
             </a>
             <div class="d-flex align-items-center">
-                <a href="#" class="btn btn-outline-danger btn-sm fw-bold">Cerrar Sesión</a>
+                <a href="/AsistentePersonal/logout" class="btn btn-outline-danger btn-sm fw-bold">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
@@ -54,7 +54,7 @@
                         <p class="card-text text-muted mb-4 flex-grow-1">
                             Modifica o revisa tus datos personales, información de contacto, zonas geográficas de asistencia y disponibilidad horaria.
                         </p>
-                        <a th:href="@{/AsistentePersonal/update/{id}(id=${asistente.idAsistente})}" class="btn btn-teal btn-lg mt-auto w-100 fw-bold">
+                        <a th:href="@{/AsistentePersonal/perfil}" class="btn btn-teal btn-lg mt-auto w-100 fw-bold">
                             Gestionar Perfil
                         </a>
                     </div>

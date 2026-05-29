@@ -87,6 +87,8 @@ public class AsistentePersonalDao {
         );
     }
 
+    
+
     public List<AsistentePersonal> buscarCompatibles(APRequest request) {
         return jdbcTemplate.query(
                 "SELECT * FROM AsistentePersonal",
@@ -116,4 +118,12 @@ public class AsistentePersonalDao {
         );
         return count != null && count > 0;
     }
+
+        // Obtiene la lista de asistentes personales pendientes de aceptación
+        public List<AsistentePersonal> getAsistentesPersonalesPendientes() {
+            return jdbcTemplate.query(
+                    "SELECT * FROM AsistentePersonal WHERE estadoAceptado = false",
+                    new AsistentePersonalRowMapper()
+            );
+        }
 }
