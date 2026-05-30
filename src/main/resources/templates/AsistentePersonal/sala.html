@@ -79,25 +79,39 @@
                             <span class="badge bg-success px-3 py-2 rounded-pill">Conectado</span>
                         </div>
                         
-                        <div class="card-body p-4 chat-container bg-light" id=\"cajaMensajes\">
-                            <div th:each="msg : ${mensajes}" class="d-flex mb-3"
-                                 th:classappend="${msg.remitente == 'ASISTENTE'} ? 'justify-content-end' : 'justify-content-start'">
+                        <div id="cajaMensajes" class="card-body bg-light p-4">  
+    
+                            <div th:if="${mensajes != null and mensajes.size() > 0 and chatActual.idChat != 0}" 
+                                id="cajaMensajes" 
+                                class="chat-container d-flex flex-column gap-3" 
+                                style="overflow-y: auto;">
                                 
-                                <div class="p-3 shadow-sm" 
-                                     th:classappend="${msg.remitente == 'ASISTENTE'} ? 'bubble-me' : 'bubble-other'" 
-                                     style="max-width: 70%; min-width: 100px;">
+                                <div th:each="mensaje : ${mensajes}" 
+                                    th:class="${mensaje.remitente == 'ASISTENTE'} ? 'd-flex flex-column align-items-end' : 'd-flex flex-column align-items-start'">
                                     
-                                    <p class="mb-1" th:text="${msg.contenido}"></p>
-                                    
-                                    <small class="d-block text-end opacity-75" style="font-size: 0.7rem;" 
-                                           th:text="${#dates.format(msg.fechaEnvio, 'HH:mm')}"></small>
+                                    <div th:class="${mensaje.remitente == 'ASISTENTE'} ? 'p-3 bubble-me max-w-75 shadow-sm' : 'p-3 bubble-other max-w-75 shadow-sm'">
+                                        <small class="d-block fw-bold mb-1" th:if="${mensaje.remitente != 'ASISTENTE'}" th:text="${mensaje.remitente}">Usuario</small>
+                                        <p class="m-0" th:text="${mensaje.contenido}">Contenido del mensaje</p>
+                                    </div>
+                                    <small class="text-muted mx-2 mt-1" style="font-size: 0.75rem;" th:text="${#dates.format(mensaje.fechaEnvio, 'HH:mm')}">12:00</small>
                                 </div>
-                                
                             </div>
+
+                            <div th:if="${mensajes == null or mensajes.size() == 0 or chatActual.idChat == 0}" 
+                                class="d-flex flex-column align-items-center justify-content-center text-center py-5 my-5 text-muted"
+                                style="min-height: 250px;">
+                                
+                                <div class="display-4 text-teal mb-3" style="opacity: 0.6;">💬</div>
+                                <h5 class="fw-bold text-dark mb-1">Aún no hay chats ni mensajes creados</h5>
+                                <p class="small text-secondary m-0" style="max-width: 320px;">
+                                    Envía el primer mensaje en el cuadro inferior para iniciar de inmediato la conversación de coordinación.
+                                </p>
+                            </div>
+
                         </div>
                         
                         <div class="card-footer bg-white p-3 border-0 rounded-bottom-4 border-top">
-                            <form th:action="@{/chat/asistente/enviar/{id}(id=${chatActual.idChat})}" method="post" class="d-flex gap-2 m-0">
+                            <form th:action="@{/chat/asistente/enviar/{idChat}(idChat=${chatActual.idChat})}" method="post" class="d-flex gap-2 m-0">
                                 <input type="text" 
                                        name="contenido" 
                                        class="form-control rounded-3 py-2" 
@@ -116,14 +130,14 @@
         </div>
     </main>
 
-    <script th:if="${chatActual.idChat != 0}">
+    <script th:if="${chatActual != null and chatActual.idChat != 0}">
         var contenedor = document.getElementById("cajaMensajes");
         if (contenedor) {
             contenedor.scrollTop = contenedor.scrollHeight;
         }
-        setInterval(function() { window.location.reload(); }, 5000);
+        setInterval(function() { window.location.reload(); }, 5000); // Refresca cada 5 segundos
     </script>
-    
+        
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

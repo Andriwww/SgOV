@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
+import es.uji.ei1027.clubesportiu.model.RegistroContrato;
 import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
 import jakarta.servlet.http.HttpSession;
 
@@ -24,6 +25,7 @@ public class AsistentePersonalController {
 
     private AsistentePersonalDao asistentePersonalDao;
     private es.uji.ei1027.clubesportiu.dao.APRequestDao apRequestDao;
+    private es.uji.ei1027.clubesportiu.dao.RegistroContratoDao registroContratoDao;
 
     @Autowired
     public void setAsistentePersonalDao(AsistentePersonalDao dao) {
@@ -33,6 +35,11 @@ public class AsistentePersonalController {
     @Autowired
     public void setAPRequestDao(es.uji.ei1027.clubesportiu.dao.APRequestDao dao) {
         this.apRequestDao = dao;
+    }
+
+    @Autowired
+    public void setRegistroContratoDao(es.uji.ei1027.clubesportiu.dao.RegistroContratoDao dao) {
+        this.registroContratoDao = dao;
     }
 
     // LISTAR ASISTENTES
@@ -313,5 +320,26 @@ public class AsistentePersonalController {
         }
 
         return "redirect:/AsistentePersonal/solicitudes";
+    }
+
+
+    @RequestMapping(value = "/contratos", method = RequestMethod.GET)
+    public String misContratos(HttpSession session, Model model) {
+        // 1. Validar seguridad de la sesión
+        AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+        if (asistente == null) {
+            return "redirect:/AsistentePersonal/login";
+        }
+
+        // 2. Pasar el usuario explícitamente para evitar problemas en el navbar de Thymeleaf
+        model.addAttribute("usuarioLogueado", asistente);
+
+        // 3. Buscar los contratos en el DAO usando el ID del asistente
+        List<RegistroContrato> contratos = registroContratoDao.getContratosPorAsistente(asistente.getIdAsistente());
+        
+        // 💡 IMPORTANTE: El nombre que guardes aquí en el model debe coincidir con el th:each del HTML
+        model.addAttribute("contratosAsistente", contratos);
+
+        return "AsistentePersonal/contratos";
     }
 }

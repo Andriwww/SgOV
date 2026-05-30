@@ -77,7 +77,7 @@ public class ChatDao {
                 idChat);
     }
 
-    public void guardarMensaje(int idChat, String remitente, String contenido) {
+    public void guardarMensaje(int idChat, int remitente, String contenido) {
         jdbcTemplate.update(
                 "INSERT INTO mensajechat (idchat, remitente, contenido) VALUES (?, ?, ?)",
                 idChat, remitente, contenido);

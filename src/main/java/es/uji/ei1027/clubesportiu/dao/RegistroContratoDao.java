@@ -1,11 +1,14 @@
 package es.uji.ei1027.clubesportiu.dao;
 
-import es.uji.ei1027.clubesportiu.model.RegistroContrato;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import javax.sql.DataSource;
-import java.util.List;
+
+import es.uji.ei1027.clubesportiu.model.RegistroContrato;
 
 @Repository
 public class RegistroContratoDao {
@@ -23,4 +26,11 @@ public class RegistroContratoDao {
                      "WHERE r.idusuario = ?";
         return jdbcTemplate.query(sql, new RegistroContratoRowMapper(), idUsuario);
     }
+
+    public List<RegistroContrato> getContratosPorAsistente(int idAsistente) {
+    String sql = "SELECT rc.* FROM registrocontrato rc " +
+                 "JOIN seleccion s ON rc.idseleccion = s.idseleccion " +
+                 "WHERE s.idasistente = ?";
+    return jdbcTemplate.query(sql, new RegistroContratoRowMapper(), idAsistente);
+}
 }
