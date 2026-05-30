@@ -46,7 +46,6 @@
                     <table class="table table-striped table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="ps-4 py-3" style="width: 80px;">ID</th>
                                 <th class="py-3">Datos Profesionales</th>
                                 <th class="py-3">Contacto</th>
                                 <th class="py-3">Zona / Municipio</th>
@@ -58,7 +57,6 @@
                         <tbody>
                             <tr th:each="asistente : ${asistentes}">
                                 
-                                <td class="ps-4 fw-bold text-secondary" th:text="${asistente.idAsistente}">1</td>
                                 
                                 <td>
                                     <span class="d-block fw-bold text-dark" th:text="${asistente.nombre + ' ' + asistente.apellidos}">Nombre Apellidos</span>
