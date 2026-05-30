@@ -132,7 +132,8 @@ public class AsistentePersonalController {
         AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(usuario.getEmail());
 
         if (asistenteBD == null) {
-            result.rejectValue("asistente", "invalid", "Credenciales incorrectas");
+            result.rejectValue("email", "bad-credentials", "El correo electrónico o la contraseña son incorrectos.");
+            model.addAttribute("error", "Credenciales incorrectas");
             return "AsistentePersonal/login";
         }
 
