@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
+import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.dao.TecnicoOVIDao;
 import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UserDetails;
@@ -19,6 +21,12 @@ import jakarta.servlet.http.HttpSession;
 public class TecnicoOVIController {
 
     private TecnicoOVIDao tecnicoOVIDao;
+    private AsistentePersonalDao asistentePersonalDao;
+
+    @Autowired
+    public void setAsistentePersonalDao(AsistentePersonalDao asistentePersonalDao) {
+        this.asistentePersonalDao = asistentePersonalDao;   
+    }
 
     @Autowired
     public void setTecnicoOVIDao(TecnicoOVIDao tecnicoOVIDao) {
@@ -52,11 +60,17 @@ public class TecnicoOVIController {
 
     @RequestMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
+
         TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
         if (tecnico == null) {
             return "redirect:/TecnicoOVI/login";
         }
+
+        int numSolicitudes = asistentePersonalDao.countAsistentesPendientes();
+        model.addAttribute("numSolicitudes", numSolicitudes);
+
         model.addAttribute("tecnico", tecnico);
+
         return "TecnicoOVI/dashboard";
     }
 

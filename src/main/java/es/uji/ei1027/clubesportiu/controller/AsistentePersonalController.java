@@ -45,14 +45,23 @@ public class AsistentePersonalController {
     // LISTAR ASISTENTES
     @RequestMapping("/list")
     public String list(Model model) {
-        model.addAttribute("asistentes", asistentePersonalDao.getAsistentesPersonales());
+
+        model.addAttribute("asistentes",
+            asistentePersonalDao.getAsistentesPersonales());
+
+        model.addAttribute("numSolicitudes",
+            asistentePersonalDao.countAsistentesPendientes());
+
         return "AsistentePersonal/list";
     }
 
 
     @RequestMapping("/list/pendientes")
     public String listPendientes(Model model) {
-        model.addAttribute("asistentes", asistentePersonalDao.getAsistentesPersonalesPendientes());
+
+        model.addAttribute("asistentes",
+            asistentePersonalDao.getAsistentesPersonalesPendientes());
+
         return "AsistentePersonal/TecnicoSolicitudes";
     }
 
@@ -223,9 +232,14 @@ public class AsistentePersonalController {
 
     @RequestMapping("/aceptar/{idAsistente}")
     public String aceptar(@PathVariable int idAsistente) {
+
         AsistentePersonal asistente = asistentePersonalDao.getAsistentePersonal(idAsistente);
-        asistente.setEstadoAceptado(true);
-        asistentePersonalDao.updateAsistentePersonal(asistente);
+
+        if (asistente != null) {
+            asistente.setEstadoAceptado(true);
+            asistentePersonalDao.updateAsistentePersonal(asistente);
+        }
+
         return "redirect:/AsistentePersonal/list/pendientes";
     }
 

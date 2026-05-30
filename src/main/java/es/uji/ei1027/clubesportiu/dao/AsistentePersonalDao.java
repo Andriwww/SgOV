@@ -82,7 +82,7 @@ public class AsistentePersonalDao {
     // GET ALL
     public List<AsistentePersonal> getAsistentesPersonales() {
         return jdbcTemplate.query(
-                "SELECT * FROM AsistentePersonal",
+                "SELECT * FROM AsistentePersonal WHERE estadoAceptado = true",
                 new AsistentePersonalRowMapper()
         );
     }
@@ -126,4 +126,13 @@ public class AsistentePersonalDao {
                     new AsistentePersonalRowMapper()
             );
         }
+
+
+    public int countAsistentesPendientes() {
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM AsistentePersonal WHERE estadoAceptado = false",
+            Integer.class
+        );
+        return (count != null) ? count : 0;
+    }
 }
