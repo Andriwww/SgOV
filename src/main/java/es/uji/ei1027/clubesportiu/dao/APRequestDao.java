@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import es.uji.ei1027.clubesportiu.model.APRequest;
+import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.model.Estado;
 
 @Repository
@@ -27,9 +28,8 @@ public class APRequestDao {
     public void addAPRequest(APRequest request) {
 
     jdbcTemplate.update(
-        "INSERT INTO aprequest (idusuario, fechasolicitud, descripcion, estado) VALUES (?, ?, ?, CAST(? AS estado))",
+        "INSERT INTO aprequest (idusuario, descripcion, estado) VALUES (?, ?, CAST(? AS estado))",
         request.getIdUsuario(),
-        java.sql.Date.valueOf(request.getFechaSolicitud()),
         request.getDescripcion(),
         request.getEstado().name()
     );
@@ -52,7 +52,7 @@ public class APRequestDao {
         Estado estado = request.getEstado();
 
         jdbcTemplate.update(
-                "UPDATE aprequest SET idusuario=?, fechaSolicitud=?, descripcion=?, estado=? WHERE idrequest=?",
+                "UPDATE aprequest SET idusuario=?, fechasolicitud=?, descripcion=?, estado=? WHERE idrequest=?",
                 idUsuario,
                 fechaSolicitud,
                 descripcion,
@@ -99,7 +99,6 @@ public class APRequestDao {
         );
     }
 
-    // Añadir a: es.uji.ei1027.clubesportiu.dao.APRequestDao
 
    public List<APRequest> getAPRequestsByAsistente(int idAsistente) {
         // 💡 Cambiamos s.idrequest por s.idseleccion (o el nombre exacto de la columna en tu tabla seleccion que enlaza con aprequest)
@@ -109,4 +108,5 @@ public class APRequestDao {
                     
         return jdbcTemplate.query(sql, new APRequestRowMapper(), idAsistente);
     }
+
 }

@@ -25,9 +25,7 @@ public class APRequestValidator implements Validator {
 
         // fechaSolicitud obligatoria
         if (request.getFechaSolicitud() == null) {
-            errors.rejectValue("fechaSolicitud", "obligatorio", "La fecha de solicitud es obligatoria");
-        } else if (request.getFechaSolicitud().isBefore(LocalDate.now())) {
-            errors.rejectValue("fechaSolicitud", "formato", "La fecha de la asistencia no puede estar en el pasado");
+            request.setFechaSolicitud(LocalDate.now());
         }
 
         // descripcion opcional pero con límite razonable

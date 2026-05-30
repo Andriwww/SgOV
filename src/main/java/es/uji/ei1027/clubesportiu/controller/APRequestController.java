@@ -2,6 +2,9 @@ package es.uji.ei1027.clubesportiu.controller;
 
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,10 +33,16 @@ public class APRequestController {
     private APRequestDao apRequestDao;
     
     private AsistentePersonalDao asistentePersonalDao;
+    private Map<Integer, List<AsistentePersonal>> candidatosPorSolicitud = new HashMap<>();
 
     @Autowired
     public void setApRequestDao(APRequestDao apRequestDao) {
         this.apRequestDao = apRequestDao;
+    }
+
+    @Autowired
+    public void setAsistentePersonalDao(AsistentePersonalDao asistentePersonalDao) {
+        this.asistentePersonalDao = asistentePersonalDao;
     }
 
     // LISTAR
@@ -85,19 +94,6 @@ public class APRequestController {
         apRequestDao.addAPRequest(apRequest);
         
         return "redirect:/APRequest/list";
-    }
-
-    @GetMapping("/assign/{id}")
-    public String assignAssistants(@PathVariable int id, Model model) {
-
-        APRequest request = apRequestDao.getAPRequest(id);
-
-        List<AsistentePersonal> candidatos = asistentePersonalDao.buscarCompatibles(request);
-
-        model.addAttribute("request", request);
-        model.addAttribute("candidatos", candidatos);
-
-        return "APRequest/assign";
     }
 
     // FORMULARIO EDITAR
@@ -153,5 +149,82 @@ public class APRequestController {
     public String delete(@PathVariable int id) {
         apRequestDao.deleteAPRequest(id);
         return "redirect:/APRequest/list";
+    }
+
+    // LISTAR ASISTENTES
+    @GetMapping("/assign/{id}")
+    public String assignAssistants(@PathVariable int id, Model model) {
+
+        APRequest request = apRequestDao.getAPRequest(id);
+
+        List<AsistentePersonal> asistentes =
+                asistentePersonalDao.getAsistentesPersonales();
+
+        List<AsistentePersonal> candidatos =
+                candidatosPorSolicitud.getOrDefault(id, new ArrayList<>());
+
+        model.addAttribute("request", request);
+        model.addAttribute("asistentes", asistentes);
+        model.addAttribute("candidatos", candidatos);
+
+        return "APRequest/assign";
+    }
+
+    // AÑADIR CANDIDATO
+    @GetMapping("/candidatos/add/{idSolicitud}/{idAsistente}")
+    public String addCandidato(@PathVariable int idSolicitud,
+                            @PathVariable int idAsistente) {
+
+        AsistentePersonal asistente =
+                asistentePersonalDao.getAsistentePersonal(idAsistente);
+
+        candidatosPorSolicitud
+            .computeIfAbsent(idSolicitud, k -> new ArrayList<>())
+            .add(asistente);
+
+        return "redirect:/APRequest/assign/" + idSolicitud;
+    }
+
+    // VER CANDIDATOS
+    @GetMapping("/candidatos/{idSolicitud}")
+    public String verCandidatos(@PathVariable int idSolicitud, Model model) {
+
+        List<AsistentePersonal> candidatos =
+                candidatosPorSolicitud.getOrDefault(idSolicitud, new ArrayList<>());
+
+        model.addAttribute("candidatos", candidatos);
+        model.addAttribute("idSolicitud", idSolicitud);
+
+        return "APRequest/candidatos";
+    }
+
+    // ENVIAR LISTA CANDIDATOS
+    @GetMapping("/candidatos/enviar/{idSolicitud}")
+    public String enviarCandidatos(@PathVariable int idSolicitud) {
+
+        List<AsistentePersonal> lista =
+                candidatosPorSolicitud.get(idSolicitud);
+
+        if (lista != null) {
+            System.out.println("Enviando candidatos de solicitud " + idSolicitud);
+            lista.forEach(a -> System.out.println(a.getNombre()));
+        }
+
+        return "redirect:/APRequest/list";
+    }
+
+    // ELIMINAR CANDIDATO
+    @GetMapping("/candidatos/delete/{idSolicitud}/{idAsistente}")
+    public String deleteCandidato(@PathVariable int idSolicitud,
+                                @PathVariable int idAsistente) {
+
+        List<AsistentePersonal> lista =
+                candidatosPorSolicitud.get(idSolicitud);
+
+        if (lista != null) {
+            lista.removeIf(a -> a.getIdAsistente() == idAsistente);
+        }
+
+        return "redirect:/APRequest/candidatos/" + idSolicitud;
     }
 }

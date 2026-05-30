@@ -41,8 +41,6 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4" th:if="${rol == 'TECNICO'}">ID Usuario</th>
-                            <th th:classappend="${rol != 'TECNICO' ? 'ps-4' : ''}">Fecha</th>
                             <th>Descripción</th>
                             <th>Estado</th>
                             <th th:if="${rol == 'TECNICO'}" class="text-center">Acciones del Técnico</th>
@@ -51,10 +49,6 @@
                     </thead>
                     <tbody>
                         <tr th:each="request : ${requests}">
-                            
-                            <td class="ps-4 fw-bold text-teal" th:if="${rol == 'TECNICO'}" th:text="${request.idUsuario}">123</td>
-                            
-                            <td th:classappend="${rol != 'TECNICO' ? 'ps-4 fw-bold' : 'fw-bold'}" th:text="${request.fechaSolicitud}">01/01/2024</td>
                             
                             <td th:text="${request.descripcion}">Descripción...</td>
                             
