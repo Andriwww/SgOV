@@ -21,13 +21,6 @@
     </nav>
 
     <main class="container">
-        <div th:if="${tieneAsistente}" class="alert alert-info border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center" role="alert">
-            <span class="fs-4 me-2">🔒</span>
-            <div>
-                <strong>Proceso de selección finalizado.</strong> Ya has asignado un asistente definitivo a esta solicitud. Los chats siguen disponibles para comunicación, pero no se pueden realizar nuevas elecciones.
-            </div>
-        </div>
-
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="text-teal fw-bold mb-0">Candidatos Propuestos</h2>
@@ -51,16 +44,9 @@
                                 💬 Empezar Chat
                             </a>
                             
-                            <a th:if="${!tieneAsistente}" 
-                               th:href="@{/APRequest/candidatos/seleccionar/{idSolicitud}/{idAsistente}(idSolicitud=${idSolicitud}, idAsistente=${candidato.idAsistente})}"
-                               class="btn btn-success fw-bold w-100"
-                               onclick="return confirm('¿Estás seguro de que deseas elegir a este asistente de forma definitiva? Esta acción cerrará el proceso de selección y no se puede deshacer.')">
+                            <a href="#" class="btn btn-outline-success fw-bold w-100">
                                 ✅ Elegir como Asistente
                             </a>
-
-                            <span th:if="${tieneAsistente}" class="badge bg-light text-secondary p-2 rounded-3 fw-bold">
-                                Selección guardada
-                            </span>
                         </div>
                     </div>
                 </div>

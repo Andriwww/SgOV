@@ -9,7 +9,6 @@ public class APRequest {
     private LocalDate fechaSolicitud;
     private String descripcion;
     private Estado estado;
-    private Integer idSeleccion;
 
     public APRequest() {
     }
@@ -52,14 +51,6 @@ public class APRequest {
 
     public void setEstado(Estado estado) {
         this.estado = estado;
-    }
-
-    public Integer getIdSeleccion() {
-        return idSeleccion;
-    }
-
-    public void setIdSeleccion(Integer idSeleccion) {
-        this.idSeleccion = idSeleccion;
     }
 
     @Override
