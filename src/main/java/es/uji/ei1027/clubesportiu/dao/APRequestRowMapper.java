@@ -16,6 +16,7 @@ public class APRequestRowMapper implements RowMapper<APRequest> {
         request.setFechaSolicitud(rs.getDate("fechasolicitud").toLocalDate());
         request.setDescripcion(rs.getString("descripcion"));
         request.setEstado(Estado.valueOf(rs.getString("estado")));
+        request.setIdSeleccion((Integer) rs.getObject("idseleccion"));
         return request;
     }
 }

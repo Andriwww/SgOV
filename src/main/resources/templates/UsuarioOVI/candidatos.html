@@ -44,9 +44,15 @@
                                 💬 Empezar Chat
                             </a>
                             
-                            <a href="#" class="btn btn-outline-success fw-bold w-100">
-                                ✅ Elegir como Asistente
+                            <a th:if="${!tieneAsistente}" 
+                            th:href="@{/APRequest/candidatos/seleccionar/{idSolicitud}/{idAsistente}(idSolicitud=${idSolicitud}, idAsistente=${candidato.idAsistente})}" 
+                            class="btn btn-success btn-sm fw-bold">
+                                ✅ Elegir como asistente
                             </a>
+
+                            <button th:if="${tieneAsistente}" class="btn btn-secondary btn-sm" disabled>
+                                Asistente ya seleccionado
+                            </button>
                         </div>
                     </div>
                 </div>

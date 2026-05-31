@@ -64,6 +64,15 @@ public class APRequestDao {
         );
     }
 
+    public void asignarAsistente(int idSolicitud, int idAsistente, int idUsuario) {
+        String insertSeleccion = "INSERT INTO seleccion (fechaseleccion, estado, idusuario, idasistente) " +
+                                 "VALUES (CURRENT_DATE, CAST('pendiente' AS estado), ?, ?) RETURNING idseleccion";
+        
+        Integer idSeleccionGenerado = jdbcTemplate.queryForObject(insertSeleccion, Integer.class, idUsuario, idAsistente);
+        
+        String updateRequest = "UPDATE aprequest SET idseleccion = ? WHERE idrequest = ?";
+        jdbcTemplate.update(updateRequest, idSeleccionGenerado, idSolicitud);
+    }
     
     public APRequest getAPRequest(int idRequest) {
         try {

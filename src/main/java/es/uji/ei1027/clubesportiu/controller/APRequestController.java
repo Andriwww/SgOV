@@ -117,11 +117,15 @@ public class APRequestController {
         List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(id);
         if (candidatos == null) candidatos = new ArrayList<>();
 
+        boolean tieneAsistente = (request.getIdSeleccion() != null);
+
         model.addAttribute("request", request);
         model.addAttribute("asistentes", todosAsistentes);
-        model.addAttribute("ids", idsAsignados); 
+        model.addAttribute("ids", idsAsignados);
         model.addAttribute("candidatos", candidatos);
-        model.addAttribute("tecnico", tecnico); 
+        model.addAttribute("tecnico", tecnico);
+        
+        model.addAttribute("tieneAsistente", tieneAsistente); 
 
         return "APRequest/assign";
     }
@@ -167,22 +171,39 @@ public class APRequestController {
             return "redirect:/UsuarioOVI/login";
         }
 
+        APRequest solicitud = apRequestDao.getAPRequest(idSolicitud);
+        boolean tieneAsistente = (solicitud != null && solicitud.getIdSeleccion() != null);
+
         List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(idSolicitud);
 
+        model.addAttribute("tieneAsistente", tieneAsistente);
         model.addAttribute("candidatos", candidatos);
         model.addAttribute("idSolicitud", idSolicitud);
+        
+        model.addAttribute("request", solicitud); 
 
-        return "UsuarioOVI/candidatos"; 
+        return "UsuarioOVI/candidatos";
     }
 
-    @GetMapping("/seleccionar/{idSolicitud}")
-    public String seleccionarAsistente(@PathVariable int idSolicitud, HttpSession session) {
+    @GetMapping("/candidatos/seleccionar/{idSolicitud}/{idAsistente}")
+    public String seleccionarAsistente(
+            @PathVariable("idSolicitud") int idSolicitud, 
+            @PathVariable("idAsistente") int idAsistente, 
+            HttpSession session) {
+        
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/UsuarioOVI/login";
         }
 
-        return "redirect:/APRequest/list";
+        APRequest solicitud = apRequestDao.getAPRequest(idSolicitud);
+        if (solicitud != null && solicitud.getIdSeleccion() != null) {
+            return "redirect:/APRequest/candidatos/" + idSolicitud + "?error=ya_asignado";
+        }
+
+        apRequestDao.asignarAsistente(idSolicitud, idAsistente, usuario.getIdUsuario());
+
+        return "redirect:/APRequest/list"; 
     }
 
     @GetMapping("/candidatos/{idSolicitud}")
@@ -198,6 +219,9 @@ public class APRequestController {
         
         APRequest request = apRequestDao.getAPRequest(idSolicitud);
         model.addAttribute("request", request);
+
+        boolean tieneAsistente = (request != null && request.getIdSeleccion() != null);
+        model.addAttribute("tieneAsistente", tieneAsistente);
 
         TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
         if (tecnico != null) {
