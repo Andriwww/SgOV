@@ -43,21 +43,16 @@ public class APRequestDao {
         );
     }
 
-    // UPDATE
     public void updateAPRequest(APRequest request) {
-        int idRequest = request.getIdRequest();
-        int idUsuario = request.getIdUsuario();
-        LocalDate fechaSolicitud = request.getFechaSolicitud();
-        String descripcion = request.getDescripcion();
-        Estado estado = request.getEstado();
-
-        jdbcTemplate.update(
-                "UPDATE aprequest SET idusuario=?, fechasolicitud=?, descripcion=?, estado=? WHERE idrequest=?",
-                idUsuario,
-                fechaSolicitud,
-                descripcion,
-                estado.name(),
-                idRequest
+        // 💡 SOLUCIÓN: Añadimos '::estado' para indicarle a PostgreSQL que convierta el String al tipo Enum de la BD
+        String sql = "UPDATE aprequest SET idusuario=?, fechasolicitud=?, descripcion=?, estado=?::estado WHERE idrequest=?";
+        
+        jdbcTemplate.update(sql, 
+            request.getIdUsuario(), 
+            request.getFechaSolicitud(), 
+            request.getDescripcion(), 
+            request.getEstado().name(), // .name() enviará "pendiente", "en_revision", etc., en minúsculas perfectamente
+            request.getIdRequest()
         );
     }
 

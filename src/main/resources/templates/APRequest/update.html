@@ -28,8 +28,8 @@
                 </div>
 
                 <div class="card shadow-sm border-0 rounded-3 p-4">
-                    <form action="#" th:action="@{/APRequest/update}" th:object="${aprequest}" method="post">
-                        
+                    <form action="#" th:action="@{/APRequest/update}" th:object="${apRequest}" method="post">
+            
                         <input type="hidden" th:field="*{idRequest}" />
 
                         <div class="row mb-3">
@@ -63,9 +63,6 @@
                                 <option value="con_contrato">Con contrato</option>
                                 <option value="finalizada">Finalizada</option>
                             </select>
-                            <div class="form-text mt-2">
-                                Actualiza el estado según el progreso de gestión de la OVI.
-                            </div>
                         </div>
 
                         <div class="d-grid">

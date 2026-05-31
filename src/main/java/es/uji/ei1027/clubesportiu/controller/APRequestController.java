@@ -272,4 +272,45 @@ public class APRequestController {
 
         return "APRequest/verChatTecnico"; 
     }
+
+    // MOSTRAR FORMULARIO DE EDICIÓN (GET)
+    @GetMapping("/update/{id}")
+    public String updateAPRequest(@PathVariable("id") int id, Model model, HttpSession session) {
+        // Solo el técnico debería poder cambiar los estados manualmente
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
+        }
+
+        APRequest request = apRequestDao.getAPRequest(id);
+        if (request == null) {
+            return "redirect:/APRequest/list";
+        }
+
+        model.addAttribute("apRequest", request);
+        // Pasamos todos los valores del Enum Estado para que el HTML pueda montar un <select>
+        model.addAttribute("estados", Estado.values()); 
+        
+        return "APRequest/update"; // Esto llamará a tu archivo update.html
+    }
+
+    // PROCESAR FORMULARIO DE EDICIÓN (POST)
+    @PostMapping("/update")
+    public String processUpdateSubmit(@ModelAttribute("apRequest") APRequest apRequest, 
+                                      BindingResult bindingResult, HttpSession session) {
+                                          
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "APRequest/update";
+        }
+        
+        // Llamamos al DAO para que guarde el nuevo estado
+        apRequestDao.updateAPRequest(apRequest);
+        
+        return "redirect:/APRequest/list";
+    }
 }
