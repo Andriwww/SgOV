@@ -42,7 +42,7 @@ public class AsistentePersonalController {
         this.registroContratoDao = dao;
     }
 
-    // LISTAR ASISTENTES
+    
     @RequestMapping("/list")
     public String list(Model model) {
 
@@ -80,18 +80,18 @@ public class AsistentePersonalController {
 
 
 
-    // MOSTRAR FORMULARIO DE ALTA / SOLICITUD (GET)
+    
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String register(Model model) {
         model.addAttribute("asistente", new AsistentePersonal());
-        return "AsistentePersonal/register"; // Renderiza el archivo register.html
+        return "AsistentePersonal/register"; 
     }
 
 
 
 
 
-    // PROCESAR FORMULARIO DE ALTA / SOLICITUD (POST)
+    
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
                                 BindingResult result, HttpSession session) {
@@ -100,18 +100,18 @@ public class AsistentePersonalController {
         validator.validate(asistente, result);
 
         if (result.hasErrors()) {
-            return "AsistentePersonal/register"; // Si falla, recarga register.html mostrando los mensajes de error
+            return "AsistentePersonal/register"; 
         }
 
         BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
         String passEncriptada = passwordEncryptor.encryptPassword(asistente.getContraseña());
     
         asistente.setContraseña(passEncriptada);
-        asistente.setEstadoAceptado(false); // Por defecto, el asistente no está aceptado
+        asistente.setEstadoAceptado(false); 
 
         asistentePersonalDao.addAsistentePersonal(asistente);
-        session.setAttribute("asistenteLogueado", asistente); // Guardamos el asistente recién registrado en sesión
-        return "redirect:/AsistentePersonal/esperaValidacion"; // Redirige a la página de espera de validación
+        session.setAttribute("asistenteLogueado", asistente); 
+        return "redirect:/AsistentePersonal/esperaValidacion"; 
     }
 
 
@@ -161,38 +161,38 @@ public class AsistentePersonalController {
 
 
 
-     // MOSTRAR PERFIL DEL ASISTENTE
+     
      @RequestMapping("/perfil")
      public String perfil(Model model, HttpSession session) {
          AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
             if (asistente == null) {
-                return "redirect:/AsistentePersonal/login"; // Si no hay asistente en sesión, redirige al login
+                return "redirect:/AsistentePersonal/login"; 
             }
          AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(asistente.getEmail());
          model.addAttribute("asistente", asistenteBD);
-         return "AsistentePersonal/perfil"; // Renderiza el archivo perfil.html
+         return "AsistentePersonal/perfil"; 
      }
 
 
 
 
 
-    // MOSTRAR FORMULARIO DE EDICIÓN DE PERFIL (GET)
+    
     @RequestMapping("/update")
     public String editForm(Model model, HttpSession session) {
         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
         if (asistente == null) {
-            return "redirect:/AsistentePersonal/login"; // Si no hay asistente en sesión, redirige al login
+            return "redirect:/AsistentePersonal/login"; 
         }
         model.addAttribute("asistente", asistente);
-        return "AsistentePersonal/update"; // Renderiza el archivo update.html
+        return "AsistentePersonal/update"; 
     }
 
 
 
 
 
-    // PROCESAR FORMULARIO DE EDICIÓN DE PERFIL (POST)
+    
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String editSubmit(@ModelAttribute("asistente") AsistentePersonal asistente,
                              BindingResult result) {
@@ -201,7 +201,7 @@ public class AsistentePersonalController {
         validator.validate(asistente, result);
 
         if (result.hasErrors()) {
-            return "AsistentePersonal/update"; // Si falla la edición, recarga update.html reteniendo los campos erróneos
+            return "AsistentePersonal/update"; 
         }
 
         AsistentePersonal asistenteBD = asistentePersonalDao.getAsistentePersonalByEmail(asistente.getEmail());
@@ -210,7 +210,7 @@ public class AsistentePersonalController {
             return "AsistentePersonal/update";
         }
 
-        asistente.setContraseña(asistenteBD.getContraseña()); // Mantenemos la contraseña actual sin cambios
+        asistente.setContraseña(asistenteBD.getContraseña()); 
         asistentePersonalDao.updateAsistentePersonal(asistente);
         return "redirect:main";
     }
@@ -220,7 +220,7 @@ public class AsistentePersonalController {
 
 
 
-    // ELIMINAR ASISTENTE
+    
     @RequestMapping("/delete/{idAsistente}")
     public String delete(@PathVariable int idAsistente) {
         asistentePersonalDao.deleteAsistentePersonal(idAsistente);
@@ -269,41 +269,41 @@ public class AsistentePersonalController {
             return "redirect:/AsistentePersonal/login";
         }
         
-        // 2. CORRECCIÓN: Consultar los datos actualizados directamente al DAO (Base de datos)
+        
         AsistentePersonal asistenteReal = asistentePersonalDao.getAsistentePersonalByEmail(asistenteSesion.getEmail());
         
-        // 3. Comprobamos el estado del objeto recién traído de la base de datos
+        
         if (asistenteReal != null && asistenteReal.isEstadoAceptado()) {
-            // Opcional pero recomendado: Actualizamos la sesión con el nuevo estado del usuario
+            
             session.setAttribute("asistenteLogueado", asistenteReal);
             
-            // Redirigimos al menú principal
+            
             return "redirect:/AsistentePersonal/main"; 
         }
         
-        // Si sigue sin estar aceptado, se queda en la pantalla de espera
+        
         return "AsistentePersonal/esperaValidacion"; 
     }
 
-    // 1. VISUALIZACIÓN DE SOLICITUDES
+    
     @RequestMapping(value = "/solicitudes", method = RequestMethod.GET)
     public String misSolicitudes(HttpSession session, Model model) {
-        // Control de seguridad: Verificar sesión activa del asistente
+        
         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
         if (asistente == null) {
             return "redirect:/AsistentePersonal/login";
         }
 
-        // Obtener las solicitudes asignadas a este asistente cruzando con la tabla Selección
+        
         List<APRequest> solicitudes = apRequestDao.getAPRequestsByAsistente(asistente.getIdAsistente());
 
-        // Pasamos la variable con el nombre exacto que requiere el HTML: "solicitudesAsistente"
+        
         model.addAttribute("solicitudesAsistente", solicitudes);
 
         return "AsistentePersonal/solicitudes";
     }
 
-    // 2. ACCIÓN DE ACEPTAR LA SOLICITUD
+    
     @RequestMapping(value = "/solicitudes/aceptar/{id}", method = RequestMethod.GET)
     public String aceptarSolicitud(@PathVariable("id") int idRequest, HttpSession session) {
         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
@@ -313,14 +313,14 @@ public class AsistentePersonalController {
 
         APRequest request = apRequestDao.getAPRequest(idRequest);
         if (request != null) {
-            request.setEstado(es.uji.ei1027.clubesportiu.model.Estado.aprobada); // Cambia al Enum en mayúsculas
+            request.setEstado(es.uji.ei1027.clubesportiu.model.Estado.aprobada); 
             apRequestDao.updateEstadoAPRequest(request);
         }
 
         return "redirect:/AsistentePersonal/solicitudes";
     }
 
-    // 3. ACCIÓN DE RECHAZAR LA SOLICITUD
+    
     @RequestMapping(value = "/solicitudes/rechazar/{id}", method = RequestMethod.GET)
     public String rechazarSolicitud(@PathVariable("id") int idRequest, HttpSession session) {
         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
@@ -340,19 +340,15 @@ public class AsistentePersonalController {
 
     @RequestMapping(value = "/contratos", method = RequestMethod.GET)
     public String misContratos(HttpSession session, Model model) {
-        // 1. Validar seguridad de la sesión
         AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
         if (asistente == null) {
             return "redirect:/AsistentePersonal/login";
         }
 
-        // 2. Pasar el usuario explícitamente para evitar problemas en el navbar de Thymeleaf
         model.addAttribute("usuarioLogueado", asistente);
 
-        // 3. Buscar los contratos en el DAO usando el ID del asistente
         List<RegistroContrato> contratos = registroContratoDao.getContratosPorAsistente(asistente.getIdAsistente());
         
-        // 💡 IMPORTANTE: El nombre que guardes aquí en el model debe coincidir con el th:each del HTML
         model.addAttribute("contratosAsistente", contratos);
 
         return "AsistentePersonal/contratos";

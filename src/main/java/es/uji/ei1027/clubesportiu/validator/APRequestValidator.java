@@ -18,22 +18,22 @@ public class APRequestValidator implements Validator {
     public void validate(Object obj, Errors errors) {
         APRequest request = (APRequest) obj;
 
-        // idUsuario obligatorio
+        
         if (request.getIdUsuario() <= 0) {
             errors.rejectValue("idUsuario", "obligatorio", "El usuario es obligatorio");
         }
 
-        // fechaSolicitud obligatoria
+        
         if (request.getFechaSolicitud() == null) {
             request.setFechaSolicitud(LocalDate.now());
         }
 
-        // descripcion opcional pero con límite razonable
+        
         if (request.getDescripcion() != null && request.getDescripcion().length() > 1000) {
             errors.rejectValue("descripcion", "longitud", "La descripción no puede superar 1000 caracteres");
         }
 
-        // estado obligatorio (aunque tenga default en BD)
+        
         if (request.getEstado() == null) {
             errors.rejectValue("estado", "obligatorio", "El estado es obligatorio");
         } 

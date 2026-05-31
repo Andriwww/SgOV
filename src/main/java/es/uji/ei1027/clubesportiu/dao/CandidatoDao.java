@@ -17,7 +17,7 @@ public class CandidatoDao {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    // 1. Guardar un nuevo candidato en la tabla (Ignora si ya existe para evitar errores)
+    
     public void addCandidato(int idRequest, int idAsistente) {
         jdbcTemplate.update(
             "INSERT INTO candidatos (idrequest, idasistente) VALUES (?, ?) ON CONFLICT DO NOTHING",
@@ -25,7 +25,7 @@ public class CandidatoDao {
         );
     }
 
-    // 2. Obtener SOLO LOS IDs de los asistentes asignados (Muy útil para tu assign.html)
+    
     public List<Integer> getIdsCandidatosPorSolicitud(int idRequest) {
         return jdbcTemplate.queryForList(
             "SELECT idasistente FROM candidatos WHERE idrequest = ?", 
@@ -34,12 +34,12 @@ public class CandidatoDao {
         );
     }
 
-    // 3. Obtener los OBJETOS Asistente completos de una solicitud (Para cuando el usuario los vea)
+    
     public List<AsistentePersonal> getAsistentesCandidatos(int idRequest) {
         String sql = "SELECT a.* FROM asistentepersonal a " +
                      "JOIN candidatos c ON a.idasistente = c.idasistente " +
                      "WHERE c.idrequest = ?";
-        // Asegúrate de que AsistentePersonalRowMapper existe y está importado
+        
         return jdbcTemplate.query(sql, new AsistentePersonalRowMapper(), idRequest); 
     }
 

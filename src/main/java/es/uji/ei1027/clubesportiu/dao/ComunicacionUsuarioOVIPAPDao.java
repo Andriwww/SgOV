@@ -19,7 +19,7 @@ public class ComunicacionUsuarioOVIPAPDao {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    // INSERT
+    
     public void addComunicacion(ComunicacionUsuarioOVIPAP comunicacion) {
 
         jdbcTemplate.update(
@@ -33,7 +33,7 @@ public class ComunicacionUsuarioOVIPAPDao {
         );
     }
 
-    // DELETE
+    
     public void deleteComunicacion(int idComunicacion) {
         jdbcTemplate.update(
                 "DELETE FROM ComunicacionUsuarioOVIPAP WHERE idComunicacion=?",
@@ -41,7 +41,7 @@ public class ComunicacionUsuarioOVIPAPDao {
         );
     }
 
-    // UPDATE
+    
     public void updateComunicacion(ComunicacionUsuarioOVIPAP comunicacion) {
 
         jdbcTemplate.update(
@@ -55,7 +55,7 @@ public class ComunicacionUsuarioOVIPAPDao {
         );
     }
 
-    // GET ONE
+    
     public ComunicacionUsuarioOVIPAP getComunicacion(int idComunicacion) {
         try {
             return jdbcTemplate.queryForObject(
@@ -68,7 +68,7 @@ public class ComunicacionUsuarioOVIPAPDao {
         }
     }
 
-    // GET ALL
+    
     public List<ComunicacionUsuarioOVIPAP> getComunicaciones() {
         return jdbcTemplate.query(
                 "SELECT * FROM ComunicacionUsuarioOVIPAP",
@@ -76,7 +76,7 @@ public class ComunicacionUsuarioOVIPAPDao {
         );
     }
 
-    // GET BY SELECCION
+    
     public List<ComunicacionUsuarioOVIPAP> getComunicacionesBySeleccion(int idSeleccion) {
         return jdbcTemplate.query(
                 "SELECT * FROM ComunicacionUsuarioOVIPAP WHERE idSeleccion=?",

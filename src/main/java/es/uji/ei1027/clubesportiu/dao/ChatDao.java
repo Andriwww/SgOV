@@ -81,12 +81,12 @@ public class ChatDao {
                 idChat, remitente, contenido);
     }
 
-// OBTENER MENSAJES DE UN CHAT
+
     public List<MensajeChat> getMensajesPorChat(int idChat) {
         try {
             return jdbcTemplate.query(
                 "SELECT * FROM mensajechat WHERE idchat = ? ORDER BY fechaenvio ASC",
-                new MensajeChatRowMapper(), // <-- Usamos el RowMapper limpio que acabamos de crear
+                new MensajeChatRowMapper(), 
                 idChat
             );
         } catch (org.springframework.dao.EmptyResultDataAccessException e) {

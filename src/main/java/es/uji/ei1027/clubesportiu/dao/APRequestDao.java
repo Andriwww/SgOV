@@ -24,7 +24,7 @@ public class APRequestDao {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    // INSERT
+    
     public void addAPRequest(APRequest request) {
 
     jdbcTemplate.update(
@@ -35,7 +35,7 @@ public class APRequestDao {
     );
 }
 
-    // DELETE
+    
     public void deleteAPRequest(int idRequest) {
         jdbcTemplate.update(
                 "DELETE FROM aprequest WHERE idrequest = ?",
@@ -44,14 +44,14 @@ public class APRequestDao {
     }
 
     public void updateAPRequest(APRequest request) {
-        // 💡 SOLUCIÓN: Añadimos '::estado' para indicarle a PostgreSQL que convierta el String al tipo Enum de la BD
+        
         String sql = "UPDATE aprequest SET idusuario=?, fechasolicitud=?, descripcion=?, estado=?::estado WHERE idrequest=?";
         
         jdbcTemplate.update(sql, 
             request.getIdUsuario(), 
             request.getFechaSolicitud(), 
             request.getDescripcion(), 
-            request.getEstado().name(), // .name() enviará "pendiente", "en_revision", etc., en minúsculas perfectamente
+            request.getEstado().name(), 
             request.getIdRequest()
         );
     }
@@ -64,7 +64,7 @@ public class APRequestDao {
         );
     }
 
-    // GET ONE
+    
     public APRequest getAPRequest(int idRequest) {
         try {
             return jdbcTemplate.queryForObject(
@@ -77,7 +77,7 @@ public class APRequestDao {
         }
     }
 
-    // GET ALL
+    
     public List<APRequest> getAPRequests() {
         return jdbcTemplate.query(
                 "SELECT * FROM aprequest",
@@ -85,7 +85,7 @@ public class APRequestDao {
         );
     }
 
-    // GET BY USER
+    
     public List<APRequest> getAPRequestsByUsuario(int idUsuario) {
         return jdbcTemplate.query(
                 "SELECT * FROM aprequest WHERE idusuario=?",
@@ -96,7 +96,7 @@ public class APRequestDao {
 
 
    public List<APRequest> getAPRequestsByAsistente(int idAsistente) {
-        // 💡 Cambiamos s.idrequest por s.idseleccion (o el nombre exacto de la columna en tu tabla seleccion que enlaza con aprequest)
+        
         String sql = "SELECT r.* FROM aprequest r " +
                     "JOIN seleccion s ON r.idrequest = s.idseleccion " + 
                     "WHERE s.idasistente = ?";

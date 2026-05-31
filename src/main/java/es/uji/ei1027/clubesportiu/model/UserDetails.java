@@ -1,7 +1,7 @@
 package es.uji.ei1027.clubesportiu.model;
 
 public class UserDetails {
-    private String usuario; // Puede ser el nombre de usuario o el email
+    private String usuario; 
     private String password;
 
     public UserDetails() {}

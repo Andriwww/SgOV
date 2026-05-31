@@ -6,15 +6,15 @@ public class AsistentePersonal {
     private String nombre;
     private String apellidos;
     private String email;
-    private String contraseña; // Vinculado a th:field="*{contraseña}"
+    private String contraseña; 
     private String telefono;
     private String disponibilidad;
     private boolean estadoAceptado;
     private boolean activo;
-    private String zona; // Vinculado a th:field="*{zona}" en update.html
-    private String preferencias; // Vinculado a th:field="*{preferencias}" en update.html
+    private String zona; 
+    private String preferencias; 
     private int puntuacion;
-    private boolean consentimientoRGBD; // Vinculado a th:field="*{consentimientoRGBD}"
+    private boolean consentimientoRGBD; 
 
     public AsistentePersonal() {
     }

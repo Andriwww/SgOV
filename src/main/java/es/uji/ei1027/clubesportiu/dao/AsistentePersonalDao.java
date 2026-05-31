@@ -22,7 +22,7 @@ public class AsistentePersonalDao {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    // INSERT: Guarda el registro completo proveniente de register.html
+    
     public void addAsistentePersonal(AsistentePersonal asistente) {
         jdbcTemplate.update(
             "INSERT INTO AsistentePersonal (nombre, apellidos, email, contraseña, telefono, disponibilidad, estadoAceptado, activo, zona, preferencias, puntuacion, consentimientoRGBD) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -41,7 +41,7 @@ public class AsistentePersonalDao {
         );
     }
 
-    // UPDATE: Actualiza todos los parámetros del asistente (incluyendo los de update.html)
+    
     public void updateAsistentePersonal(AsistentePersonal asistente) {
         jdbcTemplate.update(
             "UPDATE AsistentePersonal SET nombre=?, apellidos=?, email=?, contraseña=?, telefono=?, disponibilidad=?, estadoAceptado=?, activo=?, zona=?, preferencias=?, puntuacion=?, consentimientoRGBD=? WHERE idAsistente=?",
@@ -61,12 +61,12 @@ public class AsistentePersonalDao {
         );
     }
 
-    // DELETE
+    
     public void deleteAsistentePersonal(int idAsistente) {
         jdbcTemplate.update("DELETE FROM AsistentePersonal WHERE idAsistente=?", idAsistente);
     }
 
-    // GET ONE
+    
     public AsistentePersonal getAsistentePersonal(int idAsistente) {
         try {
             return jdbcTemplate.queryForObject(
@@ -79,7 +79,7 @@ public class AsistentePersonalDao {
         }
     }
 
-    // GET ALL
+    
     public List<AsistentePersonal> getAsistentesPersonales() {
         return jdbcTemplate.query(
                 "SELECT * FROM AsistentePersonal WHERE estadoAceptado = true",
@@ -108,7 +108,7 @@ public class AsistentePersonalDao {
         }
     }
 
-    // Comprueba si el email ya existe en otro registro diferente al actual
+    
     public boolean existeEmail(String email, int idAsistente) {
         Integer count = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM AsistentePersonal WHERE email = ? AND idAsistente != ?",
@@ -119,7 +119,7 @@ public class AsistentePersonalDao {
         return count != null && count > 0;
     }
 
-        // Obtiene la lista de asistentes personales pendientes de aceptación
+        
         public List<AsistentePersonal> getAsistentesPersonalesPendientes() {
             return jdbcTemplate.query(
                     "SELECT * FROM AsistentePersonal WHERE estadoAceptado = false",

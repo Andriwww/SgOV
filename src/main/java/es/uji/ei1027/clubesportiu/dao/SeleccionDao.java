@@ -11,11 +11,11 @@ import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.List;
 
-@Repository // En Spring els DAOs van anotats amb @Repository
+@Repository 
 public class SeleccionDao {
     private JdbcTemplate jdbcTemplate;
 
-    // Obté el jdbcTemplate a partir del Data Source
+    
     @Autowired
     public void setDataSource(DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);

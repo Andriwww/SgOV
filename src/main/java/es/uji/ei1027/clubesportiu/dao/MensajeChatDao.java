@@ -29,15 +29,15 @@ public class MensajeChatDao {
         public MensajeChat mapRow(ResultSet rs, int rowNum) throws SQLException {
             MensajeChat mensaje = new MensajeChat();
             mensaje.setIdMensaje(rs.getInt("idmensaje")); 
-            mensaje.setIdChat(rs.getInt("idchat")); // 💡 Cambia a idsolicitud si agrupas por solicitud
+            mensaje.setIdChat(rs.getInt("idchat")); 
             mensaje.setContenido(rs.getString("contenido"));
-            mensaje.setRemitente(rs.getString("remitente")); // Almacena "USUARIO" o "ASISTENTE"
-            mensaje.setFechaEnvio(rs.getTimestamp("fechaenvio")); // O el nombre de tu columna de fecha
+            mensaje.setRemitente(rs.getString("remitente")); 
+            mensaje.setFechaEnvio(rs.getTimestamp("fechaenvio")); 
             return mensaje;
         }
     }
 
-    // Obtiene todos los mensajes de una conversación específica ordenados del más viejo al más nuevo
+    
     public List<MensajeChat> getMensajesPorChat(int idChat) {
         try {
             return jdbcTemplate.query(

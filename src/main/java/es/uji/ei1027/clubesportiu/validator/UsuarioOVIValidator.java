@@ -33,7 +33,7 @@ public class UsuarioOVIValidator implements Validator {
         } else if (!usuario.getEmail().contains("@")) {
             errors.rejectValue("email", "formato", "El email no es válido");
         } else {
-            // CAMBIO AQUÍ: Al editar, permitimos que coincida con su propio ID actual
+            
             boolean emailRepetido = usuarioOVIDao.getUsuariosOVI().stream()
                     .anyMatch(u -> u.getEmail().equalsIgnoreCase(usuario.getEmail()) 
                             && u.getIdUsuario() != usuario.getIdUsuario());
@@ -43,7 +43,7 @@ public class UsuarioOVIValidator implements Validator {
             }
         }
 
-        // CAMBIO AQUÍ: La contraseña solo es obligatoria y se valida en el Registro (ID == 0)
+        
         if (usuario.getIdUsuario() == 0) {
             if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
                 errors.rejectValue("password", "obligatorio", "La contraseña es obligatoria");
@@ -56,7 +56,7 @@ public class UsuarioOVIValidator implements Validator {
             if (!usuario.getTelefono().matches("^[0-9]{9}$"))
                 errors.rejectValue("telefono", "formato", "El teléfono debe tener 9 dígitos numéricos");
 
-        // CAMBIO AQUÍ: El consentimiento RGBD solo se valida en el Registro (ID == 0)
+        
         if (usuario.getIdUsuario() == 0) {
             if (!usuario.isConsentimientoRGBD()) {
                 errors.rejectValue("consentimientoRGBD", "obligatorio", "Debe aceptar el tratamiento de protección de datos (RGBD) para registrarse");
