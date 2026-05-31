@@ -66,12 +66,23 @@
                             
                             <td class="text-center pe-4">
                                 
-                                <a th:if="${rol == 'USUARIO'}" 
-                                   th:href="@{/APRequest/delete/{id}(id=${request.idRequest})}" 
-                                   class="btn btn-outline-danger btn-sm"
-                                   onclick="return confirm('¿Deseas cancelar esta solicitud?')">
-                                    Cancelar Petición
-                                </a>
+                                <div th:if="${rol == 'USUARIO'}" class="btn-action-group">
+                                    <a th:href="@{/APRequest/usuario/candidatos/{id}(id=${request.idRequest})}" 
+                                    class="btn btn-teal btn-sm" title="Ver candidatos propuestos">
+                                        Ver Asistentes
+                                    </a>
+                                    
+                                    <a th:href="@{/APRequest/seleccionar/{id}(id=${request.idRequest})}" 
+                                    class="btn btn-outline-success btn-sm" title="Elegir asistente definitivo">
+                                        Seleccionar Asistente
+                                    </a>
+
+                                    <a th:href="@{/APRequest/delete/{id}(id=${request.idRequest})}" 
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="return confirm('¿Deseas cancelar esta solicitud de forma permanente?')">
+                                        Eliminar
+                                    </a>
+                                </div>
 
                                 <a th:if="${rol == 'USUARIO' and candidatosEnviados.containsKey(request.idRequest)}"
                                     th:href="@{/APRequest/candidatos/usuario/{idSolicitud}(idSolicitud=${request.idRequest})}"

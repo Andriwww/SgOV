@@ -247,4 +247,35 @@ public class APRequestController {
 
         return "redirect:/APRequest/candidatos/" + idSolicitud;
     }
+
+    @GetMapping("/usuario/candidatos/{idSolicitud}")
+    public String verCandidatosUsuario(@PathVariable int idSolicitud, Model model, HttpSession session) {
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
+
+        // Recuperamos la lista de candidatos asignados a esta solicitud
+        List<AsistentePersonal> candidatos =
+                candidatosPorSolicitud.getOrDefault(idSolicitud, new ArrayList<>());
+
+        model.addAttribute("candidatos", candidatos);
+        model.addAttribute("idSolicitud", idSolicitud);
+
+        // Devolvemos la nueva vista que vamos a crear en la carpeta UsuarioOVI
+        return "UsuarioOVI/candidatos"; 
+    }
+
+    // SELECCIONAR ASISTENTE DEFINITIVO (MÉTODO PREPARATORIO)
+    @GetMapping("/seleccionar/{idSolicitud}")
+    public String seleccionarAsistente(@PathVariable int idSolicitud, HttpSession session) {
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/UsuarioOVI/login";
+
+        // Aquí irá la lógica para guardar la selección final del usuario en la base de datos
+        // Por ejemplo, enlazar el ID del Asistente elegido a la solicitud o cambiar el estado.
+        // De momento redirigimos a la lista de candidatos para que elijan uno
+        
+        return "redirect:/APRequest/usuario/candidatos/" + idSolicitud;
+    }
 }
