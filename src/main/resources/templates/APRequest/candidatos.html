@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>SgOVI - Lista de Candidatos</title>
+    <title>SgOVI - Candidatos</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
 
@@ -16,11 +16,11 @@
 
 <body class="bg-light">
 
-<!-- NAV -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+<nav class="navbar navbar-light bg-white shadow-sm mb-4">
     <div class="container">
-        <a class="navbar-brand text-teal fw-bold" th:href="@{/APRequest/list}">
-            SgOVI - Peticiones
+        <a class="navbar-brand text-teal fw-bold"
+           th:href="${rol == 'TECNICO'} ? @{/APRequest/list} : @{/UsuarioOVI/list}">
+            SgOVI - Candidatos
         </a>
     </div>
 </nav>
@@ -30,19 +30,35 @@
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h2 class="text-teal fw-bold mb-0">
-            Lista de candidatos
+        <h2 class="text-teal fw-bold mb-0"
+            th:text="${rol == 'TECNICO'} ? 'Lista de candidatos' : 'Candidatos propuestos'">
         </h2>
 
-        <a th:href="@{/APRequest/assign/{id}(id=${idSolicitud})}" class="btn btn-teal">
-            Volver
+        <!-- VOLVER -->
+        <a th:if="${rol == 'TECNICO'}"
+            th:href="@{/APRequest/assign/{id}(id=${idSolicitud})}"
+            class="btn btn-teal">
+                Volver
+        </a>
+
+        <a th:if="${rol == 'USUARIO'}"
+            th:href="@{/APRequest/list}"
+            class="btn btn-teal">
+                Volver
+        </a>
+
+        <!-- ENVIAR SOLO TÉCNICO -->
+        <a th:if="${rol == 'TECNICO'}"
+           th:href="@{/APRequest/candidatos/enviar/{idSolicitud}(idSolicitud=${idSolicitud})}"
+           class="btn btn-success"
+           onclick="return confirm('¿Enviar esta lista al usuario?')">
+            Enviar lista candidatos
         </a>
 
     </div>
 
     <!-- TABLA -->
     <div class="card border-0 shadow-sm">
-
         <div class="card-body p-0">
 
             <div class="table-responsive">
@@ -50,49 +66,57 @@
                 <table class="table table-hover align-middle mb-0">
 
                     <thead class="table-light">
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Teléfono</th>
-                            <th>Zona</th>
-                            <th>Disponibilidad</th>
-                            <th>Acción</th>
-                        </tr>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Zona</th>
+                        <th>Disponibilidad</th>
+                        <th>Acción</th>
+                    </tr>
                     </thead>
 
                     <tbody>
 
-                        <!-- CANDIDATOS -->
-                        <tr th:each="asistente : ${candidatos}">
+                    <tr th:each="asistente : ${candidatos}">
 
-                            <td class="fw-bold"
-                                th:text="${asistente.nombre + ' ' + asistente.apellidos}">
-                            </td>
+                        <td class="fw-bold"
+                            th:text="${asistente.nombre + ' ' + asistente.apellidos}">
+                        </td>
 
-                            <td th:text="${asistente.email}"></td>
-                            <td th:text="${asistente.telefono}"></td>
-                            <td th:text="${asistente.zona}"></td>
-                            <td th:text="${asistente.disponibilidad}"></td>
+                        <td th:text="${asistente.email}"></td>
+                        <td th:text="${asistente.telefono}"></td>
+                        <td th:text="${asistente.zona}"></td>
+                        <td th:text="${asistente.disponibilidad}"></td>
 
-                            <td>
-                                <a th:href="@{/APRequest/candidatos/delete/{idSolicitud}/{idAsistente}(
-                                        idSolicitud=${idSolicitud},
-                                        idAsistente=${asistente.idAsistente}
-                                    )}"
-                                class="btn btn-danger btn-sm"
-                                onclick="return confirm('¿Quitar este candidato?')">
-                                    Quitar candidato
-                                </a>
-                            </td>
+                        <td>
 
-                        </tr>
+                            <!-- TÉCNICO: quitar -->
+                            <a th:if="${rol == 'TECNICO'}"
+                               th:href="@{/APRequest/candidatos/delete/{idSolicitud}/{idAsistente}(
+                                    idSolicitud=${idSolicitud},
+                                    idAsistente=${asistente.idAsistente})}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Quitar este candidato?')">
+                                Quitar candidato
+                            </a>
 
-                        <!-- VACÍO -->
-                        <tr th:if="${#lists.isEmpty(candidatos)}">
-                            <td colspan="5" class="text-center text-muted py-5">
-                                No hay candidatos añadidos aún
-                            </td>
-                        </tr>
+                            <!-- USUARIO: chat -->
+                            <a th:if="${rol == 'USUARIO'}"
+                               th:href="@{/Chat/{id}(id=${asistente.idAsistente})}"
+                               class="btn btn-primary btn-sm">
+                                Chat
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(candidatos)}">
+                        <td colspan="6" class="text-center text-muted py-5">
+                            No hay candidatos
+                        </td>
+                    </tr>
 
                     </tbody>
 
@@ -101,7 +125,6 @@
             </div>
 
         </div>
-
     </div>
 
 </main>

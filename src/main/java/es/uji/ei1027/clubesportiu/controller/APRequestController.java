@@ -34,6 +34,7 @@ public class APRequestController {
     
     private AsistentePersonalDao asistentePersonalDao;
     private Map<Integer, List<AsistentePersonal>> candidatosPorSolicitud = new HashMap<>();
+    private Map<Integer, List<AsistentePersonal>> candidatosEnviados = new HashMap<>();
 
     @Autowired
     public void setApRequestDao(APRequestDao apRequestDao) {
@@ -48,8 +49,11 @@ public class APRequestController {
     // LISTAR
     @RequestMapping("/list")
     public String list(Model model, HttpSession session) {
+
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
         TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+
+        model.addAttribute("candidatosEnviados", candidatosEnviados); 
 
         if (tecnico != null) {
             model.addAttribute("requests", apRequestDao.getAPRequests());
@@ -58,7 +62,8 @@ public class APRequestController {
         }
 
         if (usuario != null) {
-            model.addAttribute("requests", apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario()));
+            model.addAttribute("requests",
+                    apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario()));
             model.addAttribute("rol", "USUARIO");
             return "APRequest/list";
         }
@@ -194,6 +199,7 @@ public class APRequestController {
 
         model.addAttribute("candidatos", candidatos);
         model.addAttribute("idSolicitud", idSolicitud);
+        model.addAttribute("rol", "TECNICO");
 
         return "APRequest/candidatos";
     }
@@ -202,15 +208,29 @@ public class APRequestController {
     @GetMapping("/candidatos/enviar/{idSolicitud}")
     public String enviarCandidatos(@PathVariable int idSolicitud) {
 
-        List<AsistentePersonal> lista =
+        List<AsistentePersonal> candidatos =
                 candidatosPorSolicitud.get(idSolicitud);
 
-        if (lista != null) {
-            System.out.println("Enviando candidatos de solicitud " + idSolicitud);
-            lista.forEach(a -> System.out.println(a.getNombre()));
+        if (candidatos != null) {
+            candidatosEnviados.put(idSolicitud,
+                    new ArrayList<>(candidatos));
         }
 
         return "redirect:/APRequest/list";
+    }
+
+    // MOSTRAR CANDIDATOS A USUARIO
+    @GetMapping("/candidatos/usuario/{idSolicitud}")
+    public String verCandidatosUsuario(@PathVariable int idSolicitud, Model model) {
+
+        List<AsistentePersonal> candidatos =
+                candidatosEnviados.getOrDefault(idSolicitud, new ArrayList<>());
+
+        model.addAttribute("candidatos", candidatos);
+        model.addAttribute("idSolicitud", idSolicitud);
+        model.addAttribute("rol", "USUARIO");
+
+        return "APRequest/candidatos";
     }
 
     // ELIMINAR CANDIDATO

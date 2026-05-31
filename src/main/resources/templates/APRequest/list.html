@@ -73,6 +73,12 @@
                                     Cancelar Petición
                                 </a>
 
+                                <a th:if="${rol == 'USUARIO' and candidatosEnviados.containsKey(request.idRequest)}"
+                                    th:href="@{/APRequest/candidatos/usuario/{idSolicitud}(idSolicitud=${request.idRequest})}"
+                                    class="btn btn-primary btn-sm">
+                                        Ver candidatos
+                                </a>
+
                                 <div th:if="${rol == 'TECNICO'}" class="btn-action-group">
                                     <a th:href="@{/APRequest/update/{id}(id=${request.idRequest})}" 
                                        class="btn btn-outline-secondary btn-sm" title="Modificar estado">
