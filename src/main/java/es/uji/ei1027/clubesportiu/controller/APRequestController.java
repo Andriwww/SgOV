@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable; // <- Corregido el import roto
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import jakarta.servlet.http.HttpSession;
@@ -107,29 +107,28 @@ public class APRequestController {
             return "redirect:/TecnicoOVI/login";
         }
 
-        // 1. Buscamos la solicitud. Si es nula, redirigimos para EVITAR el error 500 en Thymeleaf
         APRequest request = apRequestDao.getAPRequest(id);
         if (request == null) {
             return "redirect:/APRequest/list";
         }
 
-        // 2. Traemos todos los asistentes
+        // 💡 NUEVO: Comprobar si ya tiene asistente asignado
+        boolean tieneAsistente = (request.getIdSeleccion() != null);
+        model.addAttribute("tieneAsistente", tieneAsistente);
+
         List<AsistentePersonal> todosAsistentes = asistentePersonalDao.getAsistentesPersonales();
         if (todosAsistentes == null) todosAsistentes = new ArrayList<>();
 
-        // 3. Traemos los IDs (Para la comprobación ids.contains() de los botones)
         List<Integer> idsAsignados = candidatoDao.getIdsCandidatosPorSolicitud(id);
         if (idsAsignados == null) idsAsignados = new ArrayList<>();
 
-        // 4. CRÍTICO: Traemos los objetos completos de los candidatos (Por si la vista los pinta en una tabla)
         List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(id);
         if (candidatos == null) candidatos = new ArrayList<>();
 
-        // Pasamos TODO al modelo de forma segura
         model.addAttribute("request", request);
         model.addAttribute("asistentes", todosAsistentes);
         model.addAttribute("ids", idsAsignados); 
-        model.addAttribute("candidatos", candidatos); // ¡Esto era lo que probablemente faltaba!
+        model.addAttribute("candidatos", candidatos); 
         model.addAttribute("tecnico", tecnico); 
 
         return "APRequest/assign";
@@ -143,8 +142,13 @@ public class APRequestController {
             return "redirect:/TecnicoOVI/login";
         }
 
-        candidatoDao.addCandidato(idSolicitud, idAsistente);
+        // 🔒 SEGURIDAD: Si ya tiene selección, bloqueamos añadir
+        APRequest solicitud = apRequestDao.getAPRequest(idSolicitud);
+        if (solicitud != null && solicitud.getIdSeleccion() != null) {
+            return "redirect:/APRequest/assign/" + idSolicitud + "?error=solicitud_bloqueada";
+        }
 
+        candidatoDao.addCandidato(idSolicitud, idAsistente);
         return "redirect:/APRequest/assign/" + idSolicitud;
     }
 
@@ -155,7 +159,6 @@ public class APRequestController {
         if (tecnico == null) {
             return "redirect:/TecnicoOVI/login";
         }
-
         return "APRequest/propuestaEnviada";
     }
 
@@ -167,8 +170,13 @@ public class APRequestController {
             return "redirect:/TecnicoOVI/login";
         }
 
-        candidatoDao.deleteCandidato(idSolicitud, idAsistente);
+        // 🔒 SEGURIDAD: Si ya tiene selección, bloqueamos borrar
+        APRequest solicitud = apRequestDao.getAPRequest(idSolicitud);
+        if (solicitud != null && solicitud.getIdSeleccion() != null) {
+            return "redirect:/APRequest/assign/" + idSolicitud + "?error=solicitud_bloqueada";
+        }
 
+        candidatoDao.deleteCandidato(idSolicitud, idAsistente);
         return "redirect:/APRequest/assign/" + idSolicitud;
     }
 
@@ -180,8 +188,12 @@ public class APRequestController {
             return "redirect:/UsuarioOVI/login";
         }
 
+        APRequest solicitud = apRequestDao.getAPRequest(idSolicitud);
+        boolean tieneAsistente = (solicitud != null && solicitud.getIdSeleccion() != null);
+
         List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(idSolicitud);
 
+        model.addAttribute("tieneAsistente", tieneAsistente);
         model.addAttribute("candidatos", candidatos);
         model.addAttribute("idSolicitud", idSolicitud);
 
@@ -189,66 +201,71 @@ public class APRequestController {
     }
 
     // SELECCIONAR ASISTENTE DEFINITIVO
-    @GetMapping("/seleccionar/{idSolicitud}")
-    public String seleccionarAsistente(@PathVariable int idSolicitud, HttpSession session) {
+    @GetMapping("/candidatos/seleccionar/{idSolicitud}/{idAsistente}")
+    public String seleccionarAsistente(
+            @PathVariable("idSolicitud") int idSolicitud, 
+            @PathVariable("idAsistente") int idAsistente, 
+            HttpSession session) {
+        
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/UsuarioOVI/login";
         }
 
-        return "redirect:/APRequest/list";
+        // 🔒 SEGURIDAD: Si ya se seleccionó asistente, no se puede hacer otra vez
+        APRequest solicitud = apRequestDao.getAPRequest(idSolicitud);
+        if (solicitud != null && solicitud.getIdSeleccion() != null) {
+            return "redirect:/APRequest/candidatos/" + idSolicitud + "?error=ya_asignado";
+        }
+
+        apRequestDao.asignarAsistente(idSolicitud, idAsistente, usuario.getIdUsuario());
+
+        return "redirect:/APRequest/list"; 
     }
 
-// VER LISTA DE CANDIDATOS (Corrección de visibilidad de botones por Rol)
+    // VER LISTA DE CANDIDATOS 
     @GetMapping("/candidatos/{idSolicitud}")
     public String verListaCandidatos(@PathVariable("idSolicitud") int idSolicitud, Model model, HttpSession session) {
         
-        // 1. Obtenemos los asistentes asignados directamente desde la base de datos
         List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(idSolicitud);
-        if (candidatos == null) {
-            candidatos = new ArrayList<>();
-        }
+        if (candidatos == null) candidatos = new ArrayList<>();
 
-        // 2. Pasamos los datos que van a necesitar las vistas
+        APRequest request = apRequestDao.getAPRequest(idSolicitud);
+        // 💡 NUEVO: Calculamos si ya tiene asistente
+        boolean tieneAsistente = (request != null && request.getIdSeleccion() != null);
+
+        model.addAttribute("tieneAsistente", tieneAsistente);
         model.addAttribute("candidatos", candidatos);
         model.addAttribute("idSolicitud", idSolicitud);
-        
-        // Pasamos la solicitud entera por si la vista la requiere para sacar el idRequest u otros datos
-        APRequest request = apRequestDao.getAPRequest(idSolicitud);
         model.addAttribute("request", request);
 
-        // 3. COMPROBACIÓN Y ASIGNACIÓN DE ROLES (¡Esto arregla los botones ocultos!)
         TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
         if (tecnico != null) {
             model.addAttribute("tecnico", tecnico);
-            model.addAttribute("rol", "TECNICO"); // <- ¡CRÍTICO! Activa las opciones del Técnico en candidatos.html
+            model.addAttribute("rol", "TECNICO"); // 🛠️ CORREGIDO EL TYPO roselecciol
             return "APRequest/candidatos"; 
         }
 
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
         if (usuario != null) {
             model.addAttribute("usuario", usuario);
-            model.addAttribute("rol", "USUARIO"); // <- ¡CRÍTICO! Activa las opciones del Usuario en candidatos.html
+            model.addAttribute("rol", "USUARIO"); 
             return "UsuarioOVI/candidatos";
         }
 
-        // Si no hay sesión válida, redirigimos al login
         return "redirect:/TecnicoOVI/login";
     }
 
     // VER DETALLE DE CHAT (SÓLO LECTURA)
     @GetMapping("/chat/tecnico/ver/{idChat}")
     public String verDetalleChatTecnico(@PathVariable("idChat") int idChat, Model model, HttpSession session) {
-        // 1. Validar sesión del técnico
         TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
         if (tecnico == null) {
             return "redirect:/TecnicoOVI/login";
         }
 
-        // 2. Obtener el historial de mensajes usando MensajeChat
         List<MensajeChat> mensajes = mensajeChatDao.getMensajesPorChat(idChat);
 
-        // 3. Pasar los datos imprescindibles a la vista
         model.addAttribute("tecnico", tecnico);
         model.addAttribute("mensajes", mensajes);
         model.addAttribute("idChat", idChat);
