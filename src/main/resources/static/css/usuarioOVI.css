@@ -5,7 +5,7 @@ body {
 
 h1 {
     font-size: 2rem;
-    color: #0d9488;
+    color: #000000 !important;
     font-weight: 700;
 }
 
@@ -31,7 +31,7 @@ h1 {
 }
 
 .text-teal {
-    color: #0d9488;
+    color: #000000 !important;
 }
 
 .hero-section {
@@ -60,7 +60,7 @@ h1 {
 }
 
 .btn-teal {
-    background-color: #0d9488;
+    background-color: #000000 !important;
     color: white;
     font-weight: 500;
 }
