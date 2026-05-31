@@ -8,80 +8,90 @@
     <style>
         .chat-sidebar { height: calc(100vh - 160px); overflow-y: auto; }
         .chat-container { height: calc(100vh - 230px); overflow-y: auto; }
+        /* Mensajes enviados por MÍ (Usuario) -> Derecha y Verde/Teal */
         .bubble-me { background-color: #008080; color: white; border-radius: 15px 15px 0px 15px; }
+        /* Mensajes enviados por el OTRO (Asistente) -> Izquierda y Gris */
         .bubble-other { background-color: #f1f3f5; color: #212529; border-radius: 15px 15px 15px 0px; }
         .chat-item-active { background-color: rgba(0, 128, 128, 0.1) !important; border-left: 4px solid #008080; }
+        .btn-teal { background-color: #008080; color: white; }
+        .btn-teal:hover { background-color: #006666; color: white; }
     </style>
 </head>
+
 <body class="bg-light">
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-5">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
         <div class="container">
             <a class="navbar-brand text-teal fw-bold" th:href="@{/UsuarioOVI/dashboard}">
                 SgOVI - Área Personal
             </a>
-            <div class="d-flex align-items-center">
-                <a th:href="@{/UsuarioOVI/logout}" class="btn btn-outline-danger btn-sm fw-bold">Cerrar Sesión</a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="/UsuarioOVI/logout" class="btn btn-outline-danger btn-sm fw-bold">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
 
     <main class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="text-teal fw-bold mb-0">Centro de Mensajes</h2>
-            <a th:href="@{/UsuarioOVI/dashboard}" class="btn btn-teal">Volver</a>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 rounded-4">
-                    <div class="card-header bg-white py-3 border-0"><h5 class="fw-bold text-teal mb-0">Mis Conversaciones</h5></div>
-                    <div class="list-group list-group-flush chat-sidebar p-2">
-                        <a th:each="chat : ${chatsActivos}" th:href="@{/chat/usuario/sala/{id}(id=${chat.idChat})}"
-                           class="list-group-item list-group-item-action border-0 rounded-3 mb-2 p-3 bg-light d-flex align-items-center justify-content-between"
-                           th:classappend="${chat.idChat == chatActual.idChat} ? 'chat-item-active' : ''">
-                            <div>
-                                <span class="fw-bold d-block text-dark" th:text="${chat.nombreAsistente}">Asistente</span>
-                                <small class="text-muted">Asistente Propuesto</small>
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="height: calc(100vh - 120px);">
+            <div class="row g-0 h-100">
+                
+                <div class="col-md-4 col-lg-3 border-end bg-white d-flex flex-column h-100">
+                    <div class="p-3 border-bottom bg-light">
+                        <h5 class="mb-0 fw-bold text-secondary">Mis Conversaciones</h5>
+                    </div>
+                    <div class="list-group list-group-flush chat-sidebar flex-grow-1">
+                        <a th:each="chat : ${chats}" 
+                           th:href="@{/chat/usuario/sala/{id}(id=${chat.idChat})}"
+                           class="list-group-item list-group-item-action p-3 border-bottom"
+                           th:classappend="${chatActual != null and chat.idChat == chatActual.idChat} ? 'chat-item-active' : ''">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 fw-bold text-dark" th:text="${chat.nombreAsistente}">Asistente</h6>
+                                <small class="text-muted" th:text="${#dates.format(chat.fechaCreacion, 'dd/MM')}">Fecha</small>
                             </div>
-                            <span class="badge bg-secondary rounded-pill" th:text="'Req #' + ${chat.idRequest}"></span>
+                            <p class="mb-0 text-muted small text-truncate">Haz clic para abrir el chat</p>
                         </a>
-                        <div th:if="${#lists.isEmpty(chatsActivos)}" class="text-center p-4 text-muted small">
-                            No tienes ninguna conversación activa.
+                        
+                        <div th:if="${#lists.isEmpty(chats)}" class="text-center p-4 text-muted small">
+                            No tienes salas de chat activas todavía.
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-8">
-                <div class="card shadow-sm border-0 rounded-4 d-flex flex-column">
+                <div class="col-md-8 col-lg-9 d-flex flex-column h-100 bg-light">
                     
-                    <div th:if="${chatActual.idChat == 0}" class="card-body bg-white text-center p-5 rounded-4">
-                        <div class="display-1 mb-4">💬</div>
-                        <h4 class="fw-bold text-dark mb-2">Tu bandeja de entrada está vacía</h4>
-                        <p class="text-muted mx-auto mb-0" style="max-width: 500px;">
-                            Para iniciar una conversación con un Asistente Personal, accede a la sección <strong>"Mis Peticiones"</strong> desde tu panel y haz clic en el botón de chat de cualquiera de los candidatos propuestos por el equipo técnico.
-                        </p>
+                    <div th:if="${chatActual == null || chatActual.idChat == 0}" class="card border-0 rounded-4 shadow-sm my-auto mx-auto text-center p-5 bg-white" style="max-width: 500px;">
+                        <div class="display-1 text-muted mb-3">💬</div>
+                        <h3 class="fw-bold text-secondary">Tu Centro de Mensajería</h3>
+                        <p class="text-muted">Selecciona uno de los asistentes disponibles en el menú de la izquierda para abrir la sala y comenzar a hablar.</p>
                     </div>
 
-                    <div th:if="${chatActual.idChat != 0}" th:remove="tag">
-                        <div class="card-header bg-white py-3 border-bottom">
-                            <h5 class="fw-bold text-dark mb-0" th:text="${chatActual.nombreAsistente}">Asistente</h5>
+                    <div th:if="${chatActual != null and chatActual.idChat != 0}" class="d-flex flex-column h-100 bg-white">
+                        
+                        <div class="card-header bg-white border-0 py-3 border-bottom d-flex align-items-center">
+                            <div>
+                                <h5 class="mb-0 fw-bold text-dark" th:text="${chatActual.nombreAsistente}">Nombre del Asistente</h5>
+                                <small class="text-success d-flex align-items-center gap-1">
+                                    <span class="d-inline-block bg-success rounded-circle" style="width: 8px; height: 8px;"></span> Canal de Soporte Activo
+                                </small>
+                            </div>
                         </div>
                         
-                        <div class="card-body bg-white chat-container p-4" id="cajaMensajes">
-                            <div th:each="msg : ${mensajes}" class="d-flex mb-3"
+                        <div class="card-body chat-container p-4 bg-light" id="cajaMensajes">
+                            <div th:each="msg : ${mensajes}" class="d-flex mb-3" 
                                  th:classappend="${msg.remitente == 'USUARIO'} ? 'justify-content-end' : 'justify-content-start'">
-                                <div class="p-3 shadow-sm" th:classappend="${msg.remitente == 'USUARIO'} ? 'bubble-me' : 'bubble-other'" style="max-width: 70%;">
+                                
+                                <div class="p-3 shadow-sm" 
+                                     th:classappend="${msg.remitente == 'USUARIO'} ? 'bubble-me' : 'bubble-other'" 
+                                     style="max-width: 70%;">
                                     <p class="mb-1" th:text="${msg.contenido}"></p>
                                     <small class="d-block text-end opacity-75" style="font-size: 0.7rem;" th:text="${#dates.format(msg.fechaEnvio, 'HH:mm')}"></small>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-light p-3 border-0 rounded-bottom-4">
+                        <div class="card-footer bg-white p-3 border-top">
                             <form th:action="@{/chat/usuario/enviar/{id}(id=${chatActual.idChat})}" method="post" class="d-flex gap-2">
-                                <input type="text" name="contenido" class="form-control rounded-3 py-2" placeholder="Escribe un mensaje..." required autocomplete="off" autofocus>
+                                <input type="text" name="contenido" class="form-control rounded-3 py-2" placeholder="Escribe tu mensaje aquí..." required autocomplete="off" autofocus>
                                 <button type="submit" class="btn btn-teal fw-bold px-4 rounded-3">Enviar</button>
                             </form>
                         </div>
@@ -92,12 +102,24 @@
         </div>
     </main>
 
-    <script th:if="${chatActual.idChat != 0}">
+    <script>
+        // Realizar scroll automático al fondo al cargar si existe la caja
         var contenedor = document.getElementById("cajaMensajes");
         if (contenedor) {
             contenedor.scrollTop = contenedor.scrollHeight;
         }
-        setInterval(function() { window.location.reload(); }, 5000);
+
+        // Ejecutar bucle solo si hay un chat activo
+        var idChatActual = "[[${chatActual != null ? chatActual.idChat : 0}]]";
+        if (parseInt(idChatActual) > 0) {
+            setInterval(function() {
+                var inputMensaje = document.querySelector("input[name='contenido']");
+                // Solo refresca si el usuario no está escribiendo nada
+                if (!inputMensaje || inputMensaje.value.trim() === "") {
+                    window.location.reload();
+                }
+            }, 4000); // Cada 4 segundos para mayor agilidad
+        }
     </script>
 </body>
 </html>

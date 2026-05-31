@@ -1,9 +1,7 @@
 package es.uji.ei1027.clubesportiu.dao;
 
 import java.util.List;
-
 import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -77,9 +75,22 @@ public class ChatDao {
                 idChat);
     }
 
-    public void guardarMensaje(int idChat, int remitente, String contenido) {
+    public void guardarMensaje(int idChat, String remitente, String contenido) {
         jdbcTemplate.update(
                 "INSERT INTO mensajechat (idchat, remitente, contenido) VALUES (?, ?, ?)",
                 idChat, remitente, contenido);
+    }
+
+// OBTENER MENSAJES DE UN CHAT
+    public List<MensajeChat> getMensajesPorChat(int idChat) {
+        try {
+            return jdbcTemplate.query(
+                "SELECT * FROM mensajechat WHERE idchat = ? ORDER BY fechaenvio ASC",
+                new MensajeChatRowMapper(), // <-- Usamos el RowMapper limpio que acabamos de crear
+                idChat
+            );
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            return new java.util.ArrayList<>();
+        }
     }
 }

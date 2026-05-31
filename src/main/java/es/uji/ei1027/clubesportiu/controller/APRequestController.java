@@ -1,43 +1,41 @@
 package es.uji.ei1027.clubesportiu.controller;
 
-
-import java.util.List;
-import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Map;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PathVariable; // <- Corregido el import roto
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import jakarta.servlet.http.HttpSession;
 
 import es.uji.ei1027.clubesportiu.dao.APRequestDao;
 import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
+import es.uji.ei1027.clubesportiu.dao.CandidatoDao;
+import es.uji.ei1027.clubesportiu.dao.MensajeChatDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.model.Estado;
+import es.uji.ei1027.clubesportiu.model.MensajeChat;
 import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
-import es.uji.ei1027.clubesportiu.validator.APRequestValidator;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/APRequest")
 public class APRequestController {
+
     private APRequestDao apRequestDao;
-    
     private AsistentePersonalDao asistentePersonalDao;
-    private Map<Integer, List<AsistentePersonal>> candidatosPorSolicitud = new HashMap<>();
-    private Map<Integer, List<AsistentePersonal>> candidatosEnviados = new HashMap<>();
+    private CandidatoDao candidatoDao; 
+    @Autowired
+    private MensajeChatDao mensajeChatDao;
 
     @Autowired
-    public void setApRequestDao(APRequestDao apRequestDao) {
+    public void setAPRequestDao(APRequestDao apRequestDao) {
         this.apRequestDao = apRequestDao;
     }
 
@@ -46,208 +44,135 @@ public class APRequestController {
         this.asistentePersonalDao = asistentePersonalDao;
     }
 
-    // LISTAR
-    @RequestMapping("/list")
-    public String list(Model model, HttpSession session) {
-
-        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
-        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
-
-        model.addAttribute("candidatosEnviados", candidatosEnviados); 
-
-        if (tecnico != null) {
-            model.addAttribute("requests", apRequestDao.getAPRequests());
-            model.addAttribute("rol", "TECNICO");
-            return "APRequest/list";
-        }
-
-        if (usuario != null) {
-            model.addAttribute("requests",
-                    apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario()));
-            model.addAttribute("rol", "USUARIO");
-            return "APRequest/list";
-        }
-
-        return "redirect:/";
+    @Autowired
+    public void setCandidatoDao(CandidatoDao candidatoDao) {
+        this.candidatoDao = candidatoDao;
     }
 
-    // FORMULARIO AÑADIR
-    @RequestMapping("/add")
-    public String addForm(Model model) {
+    // LISTAR SOLICITUDES
+    @GetMapping("/list")
+    public String listAPRequests(Model model, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico != null) {
+            model.addAttribute("rol", "TECNICO");
+            model.addAttribute("requests", apRequestDao.getAPRequests());
+            return "APRequest/list";
+        } else if (session.getAttribute("usuarioLogueado") != null) {
+            UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+            model.addAttribute("rol", "USUARIO");
+            model.addAttribute("requests", apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario()));
+            return "APRequest/list";
+        }
+        return "redirect:/TecnicoOVI/login";
+    }
+
+    // CREAR NUEVA SOLICITUD
+    @GetMapping("/add")
+    public String addAPRequest(Model model, HttpSession session) {
+        if (session.getAttribute("usuarioLogueado") == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
         model.addAttribute("apRequest", new APRequest());
         return "APRequest/add";
     }
 
-    // GUARDAR
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public String addSubmit(@ModelAttribute("apRequest") APRequest apRequest, BindingResult bindingResult, HttpSession session) {
-
-        UsuarioOVI usuarioLogueado = (UsuarioOVI) session.getAttribute("usuarioLogueado");
-        if (usuarioLogueado != null) {
-            apRequest.setIdUsuario(usuarioLogueado.getIdUsuario());
+    @PostMapping("/add")
+    public String addAPRequestSubmit(@ModelAttribute("apRequest") APRequest apRequest, 
+                                     BindingResult bindingResult, HttpSession session) {
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
         }
-
-        apRequest.setEstado(Estado.pendiente);
-
-        APRequestValidator validator = new APRequestValidator();
-        validator.validate(apRequest, bindingResult);
-
         if (bindingResult.hasErrors()) {
             return "APRequest/add";
         }
-
+        apRequest.setIdUsuario(usuario.getIdUsuario());
+        apRequest.setEstado(Estado.pendiente);
         apRequestDao.addAPRequest(apRequest);
-        
         return "redirect:/APRequest/list";
     }
 
-    // FORMULARIO EDITAR
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable int id, Model model) {
-        model.addAttribute("request", apRequestDao.getAPRequest(id));
-        return "APRequest/update";
-    }
-
-    // ACTUALIZAR
-    @PostMapping("/edit")
-    public String editSubmit(@ModelAttribute APRequest request) {
-        apRequestDao.updateAPRequest(request);
-        return "redirect:/APRequest/list";
-    }
-
-    // MOSTRAR EL FORMULARIO DE EDICIÓN
-    @RequestMapping(value="/update/{id}", method = RequestMethod.GET)
-    public String editRequest(Model model, @PathVariable int id, HttpSession session) {
-        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
-        if (tecnico == null) {
-            return "redirect:/";
-        }
-
-        APRequest request = apRequestDao.getAPRequest(id);
-        
-        model.addAttribute("aprequest", request);
-        
-        return "APRequest/update";
-    }
-
-    // GUARDAR LOS CAMBIOS
-    @RequestMapping(value="/update", method = RequestMethod.POST)
-    public String processUpdateSubmit(@ModelAttribute("aprequest") APRequest request, 
-                                    BindingResult bindingResult, HttpSession session) {
-
-        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
-        if (tecnico == null) {
-            return "redirect:/";
-        }
-
-        if (bindingResult.hasErrors()) {
-            return "APRequest/update";
-        }
-
-        apRequestDao.updateEstadoAPRequest(request);
-        
-        return "redirect:/APRequest/list";
-    }
-
-    // BORRAR
+    // ELIMINAR SOLICITUD
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable int id) {
+    public String processDelete(@PathVariable int id) {
         apRequestDao.deleteAPRequest(id);
         return "redirect:/APRequest/list";
     }
 
-    // LISTAR ASISTENTES
+    // ASIGNAR ASISTENTES (VISTA TÉCNICO)
     @GetMapping("/assign/{id}")
-    public String assignAssistants(@PathVariable int id, Model model) {
+    public String asignarAsistentes(@PathVariable("id") int id, Model model, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
+        }
 
+        // 1. Buscamos la solicitud. Si es nula, redirigimos para EVITAR el error 500 en Thymeleaf
         APRequest request = apRequestDao.getAPRequest(id);
+        if (request == null) {
+            return "redirect:/APRequest/list";
+        }
 
-        List<AsistentePersonal> asistentes =
-                asistentePersonalDao.getAsistentesPersonales();
+        // 2. Traemos todos los asistentes
+        List<AsistentePersonal> todosAsistentes = asistentePersonalDao.getAsistentesPersonales();
+        if (todosAsistentes == null) todosAsistentes = new ArrayList<>();
 
-        List<AsistentePersonal> candidatos =
-                candidatosPorSolicitud.getOrDefault(id, new ArrayList<>());
+        // 3. Traemos los IDs (Para la comprobación ids.contains() de los botones)
+        List<Integer> idsAsignados = candidatoDao.getIdsCandidatosPorSolicitud(id);
+        if (idsAsignados == null) idsAsignados = new ArrayList<>();
 
+        // 4. CRÍTICO: Traemos los objetos completos de los candidatos (Por si la vista los pinta en una tabla)
+        List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(id);
+        if (candidatos == null) candidatos = new ArrayList<>();
+
+        // Pasamos TODO al modelo de forma segura
         model.addAttribute("request", request);
-        model.addAttribute("asistentes", asistentes);
-        model.addAttribute("candidatos", candidatos);
+        model.addAttribute("asistentes", todosAsistentes);
+        model.addAttribute("ids", idsAsignados); 
+        model.addAttribute("candidatos", candidatos); // ¡Esto era lo que probablemente faltaba!
+        model.addAttribute("tecnico", tecnico); 
 
         return "APRequest/assign";
     }
 
     // AÑADIR CANDIDATO
     @GetMapping("/candidatos/add/{idSolicitud}/{idAsistente}")
-    public String addCandidato(@PathVariable int idSolicitud,
-                            @PathVariable int idAsistente) {
+    public String addCandidato(@PathVariable int idSolicitud, @PathVariable int idAsistente, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
+        }
 
-        AsistentePersonal asistente =
-                asistentePersonalDao.getAsistentePersonal(idAsistente);
-
-        candidatosPorSolicitud
-            .computeIfAbsent(idSolicitud, k -> new ArrayList<>())
-            .add(asistente);
+        candidatoDao.addCandidato(idSolicitud, idAsistente);
 
         return "redirect:/APRequest/assign/" + idSolicitud;
     }
 
-    // VER CANDIDATOS
-    @GetMapping("/candidatos/{idSolicitud}")
-    public String verCandidatos(@PathVariable int idSolicitud, Model model) {
-
-        List<AsistentePersonal> candidatos =
-                candidatosPorSolicitud.getOrDefault(idSolicitud, new ArrayList<>());
-
-        model.addAttribute("candidatos", candidatos);
-        model.addAttribute("idSolicitud", idSolicitud);
-        model.addAttribute("rol", "TECNICO");
-
-        return "APRequest/candidatos";
-    }
-
-    // ENVIAR LISTA CANDIDATOS
+    // ENVIAR PROPUESTA
     @GetMapping("/candidatos/enviar/{idSolicitud}")
-    public String enviarCandidatos(@PathVariable int idSolicitud) {
-
-        List<AsistentePersonal> candidatos =
-                candidatosPorSolicitud.get(idSolicitud);
-
-        if (candidatos != null) {
-            candidatosEnviados.put(idSolicitud,
-                    new ArrayList<>(candidatos));
+    public String enviarCandidatos(@PathVariable int idSolicitud, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
         }
 
-        return "redirect:/APRequest/list";
-    }
-
-    // MOSTRAR CANDIDATOS A USUARIO
-    @GetMapping("/candidatos/usuario/{idSolicitud}")
-    public String verCandidatosUsuario(@PathVariable int idSolicitud, Model model) {
-
-        List<AsistentePersonal> candidatos =
-                candidatosEnviados.getOrDefault(idSolicitud, new ArrayList<>());
-
-        model.addAttribute("candidatos", candidatos);
-        model.addAttribute("idSolicitud", idSolicitud);
-        model.addAttribute("rol", "USUARIO");
-
-        return "APRequest/candidatos";
+        return "APRequest/propuestaEnviada";
     }
 
     // ELIMINAR CANDIDATO
     @GetMapping("/candidatos/delete/{idSolicitud}/{idAsistente}")
-    public String deleteCandidato(@PathVariable int idSolicitud,
-                                @PathVariable int idAsistente) {
-
-        List<AsistentePersonal> lista =
-                candidatosPorSolicitud.get(idSolicitud);
-
-        if (lista != null) {
-            lista.removeIf(a -> a.getIdAsistente() == idAsistente);
+    public String deleteCandidato(@PathVariable int idSolicitud, @PathVariable int idAsistente, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
         }
 
-        return "redirect:/APRequest/candidatos/" + idSolicitud;
+        candidatoDao.deleteCandidato(idSolicitud, idAsistente);
+
+        return "redirect:/APRequest/assign/" + idSolicitud;
     }
 
+    // VER CANDIDATOS (VISTA USUARIO OVI)
     @GetMapping("/usuario/candidatos/{idSolicitud}")
     public String verCandidatosUsuario(@PathVariable int idSolicitud, Model model, HttpSession session) {
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
@@ -255,27 +180,79 @@ public class APRequestController {
             return "redirect:/UsuarioOVI/login";
         }
 
-        // Recuperamos la lista de candidatos asignados a esta solicitud
-        List<AsistentePersonal> candidatos =
-                candidatosPorSolicitud.getOrDefault(idSolicitud, new ArrayList<>());
+        List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(idSolicitud);
 
         model.addAttribute("candidatos", candidatos);
         model.addAttribute("idSolicitud", idSolicitud);
 
-        // Devolvemos la nueva vista que vamos a crear en la carpeta UsuarioOVI
         return "UsuarioOVI/candidatos"; 
     }
 
-    // SELECCIONAR ASISTENTE DEFINITIVO (MÉTODO PREPARATORIO)
+    // SELECCIONAR ASISTENTE DEFINITIVO
     @GetMapping("/seleccionar/{idSolicitud}")
     public String seleccionarAsistente(@PathVariable int idSolicitud, HttpSession session) {
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/UsuarioOVI/login";
+        if (usuario == null) {
+            return "redirect:/UsuarioOVI/login";
+        }
 
-        // Aquí irá la lógica para guardar la selección final del usuario en la base de datos
-        // Por ejemplo, enlazar el ID del Asistente elegido a la solicitud o cambiar el estado.
-        // De momento redirigimos a la lista de candidatos para que elijan uno
+        return "redirect:/APRequest/list";
+    }
+
+// VER LISTA DE CANDIDATOS (Corrección de visibilidad de botones por Rol)
+    @GetMapping("/candidatos/{idSolicitud}")
+    public String verListaCandidatos(@PathVariable("idSolicitud") int idSolicitud, Model model, HttpSession session) {
         
-        return "redirect:/APRequest/usuario/candidatos/" + idSolicitud;
+        // 1. Obtenemos los asistentes asignados directamente desde la base de datos
+        List<AsistentePersonal> candidatos = candidatoDao.getAsistentesCandidatos(idSolicitud);
+        if (candidatos == null) {
+            candidatos = new ArrayList<>();
+        }
+
+        // 2. Pasamos los datos que van a necesitar las vistas
+        model.addAttribute("candidatos", candidatos);
+        model.addAttribute("idSolicitud", idSolicitud);
+        
+        // Pasamos la solicitud entera por si la vista la requiere para sacar el idRequest u otros datos
+        APRequest request = apRequestDao.getAPRequest(idSolicitud);
+        model.addAttribute("request", request);
+
+        // 3. COMPROBACIÓN Y ASIGNACIÓN DE ROLES (¡Esto arregla los botones ocultos!)
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico != null) {
+            model.addAttribute("tecnico", tecnico);
+            model.addAttribute("rol", "TECNICO"); // <- ¡CRÍTICO! Activa las opciones del Técnico en candidatos.html
+            return "APRequest/candidatos"; 
+        }
+
+        UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+        if (usuario != null) {
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("rol", "USUARIO"); // <- ¡CRÍTICO! Activa las opciones del Usuario en candidatos.html
+            return "UsuarioOVI/candidatos";
+        }
+
+        // Si no hay sesión válida, redirigimos al login
+        return "redirect:/TecnicoOVI/login";
+    }
+
+    // VER DETALLE DE CHAT (SÓLO LECTURA)
+    @GetMapping("/chat/tecnico/ver/{idChat}")
+    public String verDetalleChatTecnico(@PathVariable("idChat") int idChat, Model model, HttpSession session) {
+        // 1. Validar sesión del técnico
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
+        }
+
+        // 2. Obtener el historial de mensajes usando MensajeChat
+        List<MensajeChat> mensajes = mensajeChatDao.getMensajesPorChat(idChat);
+
+        // 3. Pasar los datos imprescindibles a la vista
+        model.addAttribute("tecnico", tecnico);
+        model.addAttribute("mensajes", mensajes);
+        model.addAttribute("idChat", idChat);
+
+        return "APRequest/verChatTecnico"; 
     }
 }
