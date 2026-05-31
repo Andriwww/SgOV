@@ -6,17 +6,7 @@
     <title>SgOVI - Mis Solicitudes de Asistencia</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/database.css}">
-    <style>
-        .text-teal { color: #0d9488 !important; }
-        .bg-teal { background-color: #0d9488 !important; }
-        .btn-teal { background-color: #0d9488 !important; color: white !important; border: none; }
-        .btn-teal:hover { background-color: #0f766e !important; color: white !important; }
-        .btn-outline-teal { color: #0d9488 !important; border-color: #0d9488 !important; }
-        .btn-outline-teal:hover { color: #fff !important; background-color: #0d9488 !important; border-color: #0d9488 !important; }
-        .badge-pendiente { background-color: #f59e0b; color: white; }
-        .badge-aceptada { background-color: #10b981; color: white; }
-        .badge-rechazada { background-color: #ef4444; color: white; }
-    </style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/asistentePersonal.css}" />
 </head>
 <body class="bg-light">
 
@@ -29,13 +19,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/AsistentePersonal/main}">Mi Perfil</a>
-                    </li>
+                   <a th:href="@{/AsistentePersonal/main}" class="btn btn-outline-secondary btn-sm fw-bold me-2">
+                    ← Volver al Panel
+                    </a>
+                    <a href="/AsistentePersonal/logout" class="btn btn-outline-danger btn-sm fw-bold">Cerrar Sesión</a>
 
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" th:href="@{/logout}">Cerrar Sesión</a>
-                    </li>
+                    
                 </ul>
             </div>
         </div>
@@ -45,10 +34,10 @@
     <main class="container my-5">
         
         <!-- BIENVENIDA E INFORMACIÓN DEL ASISTENTE LOGUEADO -->
-        <div class="card shadow-sm border-0 rounded-3 mb-4 bg-teal text-white">
+        <div class="card shadow-sm border-0 rounded-3 mb-4 th">
             <div class="card-body p-4">
                 <h4 class="m-0">¡Hola, <span th:text="${session.asistenteLogueado.nombre} + ' ' + ${session.asistenteLogueado.apellidos}">Asistente</span>!</h4>
-                <p class="m-0 text-white-50 small">Aquí puedes ver el historial y control de las solicitudes de asistencia (APRequest) que te han sido dirigidas o asignadas.</p>
+                <p class="m-0 text-teal small">Aquí puedes ver el historial y control de las solicitudes de asistencia (APRequest) que te han sido dirigidas o asignadas.</p>
             </div>
         </div>
 

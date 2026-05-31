@@ -15,7 +15,7 @@ table.dataTable {
 }
 
 table.dataTable thead {
-    background-color: #0d9488;
+    background-color: #000000 !important;
     color: white;
 }
 
