@@ -69,35 +69,16 @@ public class APRequestDao {
         );
     }
 
+    // GET ONE
     public APRequest getAPRequest(int idRequest) {
         try {
-            String sql = "SELECT idrequest, fechasolicitud, descripcion, estado, idusuario, idseleccion FROM aprequest WHERE idrequest = ?";
-            return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
-                APRequest req = new APRequest();
-                req.setIdRequest(rs.getInt("idrequest"));
-                
-                // 1. SOLUCIÓN FECHA: Extraer directamente como LocalDate
-                req.setFechaSolicitud(rs.getObject("fechasolicitud", java.time.LocalDate.class));
-                
-                req.setDescripcion(rs.getString("descripcion"));
-                
-                // 2. SOLUCIÓN ESTADO: Convertir el String al Enum (pasándolo a mayúsculas por seguridad)
-                String estadoStr = rs.getString("estado");
-                if (estadoStr != null) {
-                    req.setEstado(Estado.valueOf(estadoStr.toLowerCase())); 
-                    // 💡 Nota: Si los valores de tu Enum están en minúsculas, quita el .toUpperCase()
-                }
-                
-                // 3. SOLUCIÓN ID USUARIO: 'I' mayúscula
-                req.setIdUsuario(rs.getInt("idusuario"));
-                
-                // Mapeo del idseleccion para el control de flujo
-                req.setIdSeleccion(rs.getObject("idseleccion", Integer.class));
-                
-                return req;
-            }, idRequest);
-        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
-            return null; 
+            return jdbcTemplate.queryForObject(
+                    "SELECT * FROM aprequest WHERE idrequest=?",
+                    new APRequestRowMapper(),
+                    idRequest
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 
@@ -120,6 +101,7 @@ public class APRequestDao {
 
 
    public List<APRequest> getAPRequestsByAsistente(int idAsistente) {
+        // 💡 Cambiamos s.idrequest por s.idseleccion (o el nombre exacto de la columna en tu tabla seleccion que enlaza con aprequest)
         String sql = "SELECT r.* FROM aprequest r " +
                     "JOIN seleccion s ON r.idrequest = s.idseleccion " + 
                     "WHERE s.idasistente = ?";
@@ -127,25 +109,4 @@ public class APRequestDao {
         return jdbcTemplate.query(sql, new APRequestRowMapper(), idAsistente);
     }
 
-    public void asignarAsistente(int idSolicitud, int idAsistente, int idUsuario) {
-        
-        // 1. Insertamos en 'seleccion' y le pedimos a PostgreSQL que nos devuelva el ID autogenerado
-        // Ojo: El estado de la SELECCIÓN sí requiere un valor por tu base de datos ('pendiente' por defecto)
-        String sqlInsertSeleccion = 
-            "INSERT INTO seleccion (fechaseleccion, estado, idusuario, idasistente) " +
-            "VALUES (CURRENT_DATE, 'pendiente'::estado, ?, ?) RETURNING idseleccion";
-        
-        Integer idSeleccionGenerado = jdbcTemplate.queryForObject(
-            sqlInsertSeleccion, 
-            Integer.class, 
-            idUsuario, 
-            idAsistente
-        );
-        
-        // 2. Vinculamos este nuevo idseleccion a la solicitud (¡Sin tocar el estado!)
-        String sqlUpdateSolicitud = 
-            "UPDATE aprequest SET idseleccion = ? WHERE idrequest = ?";
-            
-        jdbcTemplate.update(sqlUpdateSolicitud, idSeleccionGenerado, idSolicitud);
-    }
 }
