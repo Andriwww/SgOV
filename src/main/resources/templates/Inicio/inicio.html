@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SgOVI - Inicio</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/usuarioOVI.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/home-accessible.css}" />
 </head>
 
 <body>
@@ -16,7 +16,7 @@
                 SgOVI
             </a>
             <div class="d-flex">
-                <a th:href="@{/Inicio/logins}" class="btn btn-outline-secondary">Iniciar sesión</a>
+                <a th:href="@{/Inicio/logins}" class="btn btn-outline-secondary fw-semibold">Iniciar sesión</a>
             </div>
         </div>
     </nav>
@@ -24,23 +24,23 @@
     <main class="container">
         <div class="hero-section text-center mb-5 shadow-sm p-5 mt-4">
             <h1 class="display-3 fw-bold mb-4">Impulsando la Vida Autónoma</h1>
-            <p class="lead fs-4 text-muted mb-5 px-md-5">
+            <p class="lead fs-4 mb-5 px-md-5">
                 Plataforma integral para la gestión de Asistencia Personal (PAP/PATI) y recursos de empoderamiento para personas con diversidad funcional.
             </p>
             <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-3">
                 <a th:href="@{/UsuarioOVI/register}" class="btn btn-teal btn-lg px-4 gap-3 py-3 fs-5">
                     Regístrate como Usuario
                 </a>
-                <a th:href="@{/AsistentePersonal/register}" class="btn btn-outline-dark btn-lg px-4 py-3 fs-5">
+                <a th:href="@{/AsistentePersonal/register}" class="btn btn-outline-secondary fw-semibold btn-lg px-4 py-3 fs-5 btn-accessible">
                     Regístrate como Asistente Personal
                 </a>
             </div>
         </div>
 
         <div class="text-center mb-4 pt-2">
-            <span class="text-uppercase tracking-widest text-teal fw-bold" style="letter-spacing: 0.15rem; font-size: 0.9rem;">Nuestra Filosofía</span>
+            <span class="text-uppercase text-teal fw-bold small">Nuestra Filosofía</span>
             <h2 class="fw-bold mt-2">Los pilares que nos mueven</h2>
-            <p class="text-muted mx-auto" style="max-width: 600px;">
+            <p class=" mx-auto w-75">
                 El SgOVI se basa en los principios fundamentales de la Vida Independiente para garantizar la autogestión y el empoderamiento.
             </p>
         </div>
@@ -52,7 +52,7 @@
                         <div class="card h-100 bg-white shadow-sm rounded-3 border-0">
                             <div class="card-body p-3 text-center">
                                 <h6 class="card-title fw-bold text-teal text-uppercase mb-1">Autodeterminación</h6>
-                                <p class="card-text text-muted" style="font-size: 0.85rem;">Control i determinación sobre nuestras propias vidas</p>
+                                <p class="card-text small">Control i determinación sobre nuestras propias vidas</p>
                             </div>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                         <div class="card h-100 bg-white shadow-sm rounded-3 border-0">
                             <div class="card-body p-3 text-center">
                                 <h6 class="card-title fw-bold text-teal text-uppercase mb-1">Derechos Humanos y Civiles</h6>
-                                <p class="card-text text-muted" style="font-size: 0.85rem;">Derechos fundamentales que todos los seres humanos tenemos que ejercer.</p>
+                                <p class="card-text " style="font-size: 0.85rem;">Derechos fundamentales que todos los seres humanos tenemos que ejercer.</p>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                         <div class="card h-100 bg-white shadow-sm rounded-3 border-0">
                             <div class="card-body p-3 text-center">
                                 <h6 class="card-title fw-bold text-teal text-uppercase mb-1">Responsabilidad</h6>
-                                <p class="card-text text-muted" style="font-size: 0.85rem;">Responsabilidad sobre la propia vida y acciones</p>
+                                <p class="card-text" style="font-size: 0.85rem;">Responsabilidad sobre la propia vida y acciones</p>
                             </div>
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                         <div class="card h-100 bg-white shadow-sm rounded-3 border-0">
                             <div class="card-body p-3 text-center">
                                 <h6 class="card-title fw-bold text-teal text-uppercase mb-1">Empoderamiento</h6>
-                                <p class="card-text text-muted" style="font-size: 0.85rem;">Posibilidad de ejercer poder.</p>
+                                <p class="card-text" style="font-size: 0.85rem;">Posibilidad de ejercer poder.</p>
                             </div>
                         </div>
                     </div>
@@ -87,7 +87,7 @@
                         <div class="card h-100 bg-white shadow-sm rounded-3 border-0">
                             <div class="card-body p-3 text-center">
                                 <h6 class="card-title fw-bold text-teal text-uppercase mb-1">Derecho</h6>
-                                <p class="card-text text-muted" style="font-size: 0.85rem;">Derecho a asumir riesgos</p>
+                                <p class="card-text" style="font-size: 0.85rem;">Derecho a asumir riesgos</p>
                             </div>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                         <div class="card h-100 bg-white shadow-sm rounded-3 border-0">
                             <div class="card-body p-3 text-center">
                                 <h6 class="card-title fw-bold text-teal text-uppercase mb-1">Inclusión</h6>
-                                <p class="card-text text-muted" style="font-size: 0.85rem;">Vivir y participar en la comunidad</p>
+                                <p class="card-text" style="font-size: 0.85rem;">Vivir y participar en la comunidad</p>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                         <div class="card h-100 bg-white shadow-sm rounded-3 border-0">
                             <div class="card-body p-3 text-center">
                                 <h6 class="card-title fw-bold text-teal text-uppercase mb-1">Autoayuda</h6>
-                                <p class="card-text text-muted" style="font-size: 0.85rem;">Soporte entre iguales</p>
+                                <p class="card-text" style="font-size: 0.85rem;">Soporte entre iguales</p>
                             </div>
                         </div>
                     </div>

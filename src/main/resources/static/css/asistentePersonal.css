@@ -1,8 +1,9 @@
 body {
-    font-family: Helvetica, Arial, sans-serif;
-    background-color: #ffffff;
-    margin: 0;
-    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa; /* bg-light de bootstrap */
 }
 
 .container {
@@ -122,4 +123,65 @@ input[type="submit"]:hover {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.text-teal {
+    color: #0d9488 !important;
+}
+        
+.btn-outline-teal {
+    color: #0d9488 !important;
+    border-color: #0d9488 !important;
+}
+        
+.btn-outline-teal:hover {
+    color: #fff !important;
+    background-color: #0d9488 !important;
+    border-color: #0d9488 !important;
+}
+
+.form-signin {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+    margin: auto;
+}
+/* Mantenemos las clases de utilidad teal para conservar la identidad visual */
+.text-teal {
+    color: #0d9488 !important;
+}
+        
+.btn-teal {
+    background-color: #0d9488 !important;
+    color: white !important;
+    border: none;
+}
+        
+.btn-teal:hover {
+    background-color: #0f766e !important;
+}
+
+.needcorrection {
+    border-color: #dc3545 !important;
+    background-color: #fff8f8;
+}
+
+        
+.bg-teal { 
+    background-color: #0d9488 !important; 
+}
+        
+.badge-pendiente { 
+    background-color: #f59e0b; 
+    color: white; 
+}
+        
+.badge-aceptada { 
+    background-color: #10b981; 
+    color: white; 
+}
+        
+.badge-rechazada { 
+    background-color: #ef4444; 
+    color: white; 
 }

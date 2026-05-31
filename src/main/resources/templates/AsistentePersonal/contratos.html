@@ -7,21 +7,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     
     <link rel="stylesheet" type="text/css" th:href="@{/css/asistentePersonal.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/database.css}">
     
-    <style>
-        .text-teal {
-            color: #0d9488 !important;
-        }
-        .btn-outline-teal {
-            color: #0d9488 !important;
-            border-color: #0d9488 !important;
-        }
-        .btn-outline-teal:hover {
-            color: #fff !important;
-            background-color: #0d9488 !important;
-            border-color: #0d9488 !important;
-        }
-    </style>
 </head>
 <body class="bg-light">
 
@@ -46,7 +33,7 @@
 
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
             <div class="table-responsive">
-                <table class="table table-align-middle mb-0">
+                <table class="table table-align-middle mb-0 database">
                     <thead class="table-light">
                         <tr>
                             <th class="ps-4 py-3">Detalles del Contrato</th>
@@ -77,3 +64,14 @@
                                     <span th:case="'Finalizado'" class="badge rounded-pill bg-danger px-3 py-2">Finalizado</span>
                                     <span th:case="'Pendiente'" class="badge rounded-pill bg-warning text-dark px-3 py-2">Pendiente</span>
                                     <span th:case="*" class="badge rounded-pill bg-dark px-3 py-2" th:text="${contrato.estado}">-</span>
+                                    </div>
+                                    </td>
+                                    </tr></tbody>
+
+                </table>
+                </div>
+                </div>
+                </main>
+
+                <th:block th:replace="fragments/datatable :: scripts"></th:block>
+                </body>
