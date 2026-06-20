@@ -49,20 +49,39 @@ public class APRequestController {
         this.candidatoDao = candidatoDao;
     }
 
-    @GetMapping("/list")
-    public String listAPRequests(Model model, HttpSession session) {
-        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
-        if (tecnico != null) {
-            model.addAttribute("rol", "TECNICO");
-            model.addAttribute("requests", apRequestDao.getAPRequests());
-            return "APRequest/list";
+    @RequestMapping("/list")
+    public String listAPRequests(HttpSession session, Model model) {
+        List<APRequest> requests = null;
+        String rol = "";
+        
+        if (session.getAttribute("tecnicoLogueado") != null) {
+            requests = apRequestDao.getAPRequests();
+            rol = "TECNICO";
         } else if (session.getAttribute("usuarioLogueado") != null) {
-            UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
-            model.addAttribute("rol", "USUARIO");
-            model.addAttribute("requests", apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario()));
-            return "APRequest/list";
+            es.uji.ei1027.clubesportiu.model.UsuarioOVI usuario = 
+                (es.uji.ei1027.clubesportiu.model.UsuarioOVI) session.getAttribute("usuarioLogueado");
+            requests = apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario());
+            rol = "USUARIO";
+        } else {
+            return "redirect:/";
         }
-        return "redirect:/TecnicoOVI/login";
+
+        java.util.Map<Integer, String> nombresUsuarios = new java.util.HashMap<>();
+
+        if (requests != null) {
+            for (APRequest req : requests) {
+                if ("TECNICO".equals(rol) && req.getIdUsuario() != 0) {
+                    String nombreUser = apRequestDao.getNombreUsuarioPorId(req.getIdUsuario());
+                    nombresUsuarios.put(req.getIdUsuario(), nombreUser);
+                }
+            }
+        }
+        
+        model.addAttribute("requests", requests);
+        model.addAttribute("rol", rol);
+        model.addAttribute("nombresUsuarios", nombresUsuarios);
+        
+        return "APRequest/list";
     }
 
     @GetMapping("/add")

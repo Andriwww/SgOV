@@ -113,4 +113,8 @@ public class APRequestDao {
         return jdbcTemplate.query(sql, new APRequestRowMapper(), idAsistente);
     }
 
+    public String getNombreUsuarioPorId(Integer idUsuario) {
+        String sql = "SELECT nombre FROM usuarioovi WHERE idusuario = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, idUsuario);
+    }
 }
