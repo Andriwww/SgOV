@@ -2,11 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pendiente de Validación</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SgOVI - Request enviada</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/css/asistentePersonal.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/apRequest.css}" />
 </head>
 <body>
     <div class="container">
@@ -19,12 +18,12 @@
                             <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
                         </svg>
                     </div>
-                    <h2 class="fw-bold text-teal mb-3">Cuenta en Revisión</h2>
+                    <h2 class="fw-bold text-teal mb-3">Petición enviada correctamente</h2>
                     <p class="text-muted mb-4">
-                        ¡Hola! Hemos recibido tu solicitud correctamente. Un técnico de <strong>SgOVI</strong> debe revisar tus datos y activar tu cuenta antes de que puedas acceder al panel.
+                        ¡Hola! Hemos recibido tu petición correctamente. Un técnico de <strong>SgOVI</strong> revisará la petición y asignará un listado de técnicos que se adecuen a tus necesidades.
                     </p>
                     <div class="mt-4">
-                        <a th:href="@{/}" class="btn btn-teal px-4 fw-bold">Volver al Inicio</a>
+                        <a th:href="@{/UsuarioOVI/dashboard}" class="btn btn-teal px-4 fw-bold">Volver</a>
                     </div>
                 </div>
             </div>

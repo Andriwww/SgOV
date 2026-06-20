@@ -87,7 +87,7 @@ public class APRequestController {
         apRequest.setIdUsuario(usuario.getIdUsuario());
         apRequest.setEstado(Estado.pendiente);
         apRequestDao.addAPRequest(apRequest);
-        return "redirect:/APRequest/list";
+        return "APRequest/aceptada";
     }
 
     @GetMapping("/delete/{id}")

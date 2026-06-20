@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.uji.ei1027.clubesportiu.dao.RegistroContratoDao;
 import es.uji.ei1027.clubesportiu.dao.UsuarioOVIDao;
+import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UserDetails;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
@@ -65,7 +66,7 @@ public class UsuarioOVIController {
 
         usuario.setEstadoAceptado(false);
         usuarioOVIDao.addUsuarioOVI(usuario);
-        return "redirect:/UsuarioOVI/login";
+        return "redirect:/UsuarioOVI/pending";
     }
 
     @GetMapping("/delete")
@@ -218,7 +219,7 @@ public class UsuarioOVIController {
     }
 
     @RequestMapping(value="/aceptar/{id}", method = RequestMethod.GET)
-    public String aceptarUsuario(@PathVariable int id, HttpSession session) {
+    public String aceptarUsuario(@PathVariable int id, HttpSession session, Model model) {
         TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
         if (tecnico == null) {
             session.invalidate();
@@ -231,6 +232,30 @@ public class UsuarioOVIController {
             usuario.setEstadoAceptado(true);
             
             usuarioOVIDao.updateUsuarioOVI(usuario);
+
+            model.addAttribute("correoUsuario", usuario.getEmail());
+
+            return "UsuarioOVI/correo";
+        }
+
+        return "redirect:/UsuarioOVI/list";
+    }
+
+    @RequestMapping("/rechazar/{idUsuario}")
+    public String rechazar(@PathVariable int idUsuario, HttpSession session, Model model) {
+
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            session.invalidate();
+            return "redirect:/";
+        }
+
+        UsuarioOVI usuario = usuarioOVIDao.getUsuarioOVI(idUsuario);
+
+        if (usuario != null) {
+            usuarioOVIDao.deleteUsuarioOVI(idUsuario);
+            model.addAttribute("correoUsuario", usuario.getEmail());
+            return "UsuarioOVI/correoDenegado";
         }
 
         return "redirect:/UsuarioOVI/list";

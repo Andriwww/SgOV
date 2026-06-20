@@ -16,6 +16,7 @@ import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.model.RegistroContrato;
+import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.validator.AsistentePersonalValidator;
 import jakarta.servlet.http.HttpSession;
 
@@ -231,13 +232,21 @@ public class AsistentePersonalController {
 
 
     @RequestMapping("/aceptar/{idAsistente}")
-    public String aceptar(@PathVariable int idAsistente) {
+    public String aceptar(@PathVariable int idAsistente, HttpSession session, Model model) {
+
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            session.invalidate();
+            return "redirect:/";
+        }
 
         AsistentePersonal asistente = asistentePersonalDao.getAsistentePersonal(idAsistente);
 
         if (asistente != null) {
             asistente.setEstadoAceptado(true);
             asistentePersonalDao.updateAsistentePersonal(asistente);
+            model.addAttribute("correoAsistente", asistente.getEmail());
+            return "AsistentePersonal/correo";
         }
 
         return "redirect:/AsistentePersonal/list/pendientes";
@@ -250,8 +259,22 @@ public class AsistentePersonalController {
     }
 
     @RequestMapping("/rechazar/{idAsistente}")
-    public String rechazar(@PathVariable int idAsistente) {
-        asistentePersonalDao.deleteAsistentePersonal(idAsistente);
+    public String rechazar(@PathVariable int idAsistente, HttpSession session, Model model) {
+
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            session.invalidate();
+            return "redirect:/";
+        }
+
+        AsistentePersonal asistente = asistentePersonalDao.getAsistentePersonal(idAsistente);
+
+        if (asistente != null) {
+            asistentePersonalDao.deleteAsistentePersonal(idAsistente);
+            model.addAttribute("correoAsistente", asistente.getEmail());
+            return "AsistentePersonal/correoDenegado";
+        }
+
         return "redirect:/AsistentePersonal/list/pendientes";
     }
 

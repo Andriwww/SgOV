@@ -67,6 +67,12 @@
                                        onclick="return confirm('¿Estás seguro de que deseas aceptar a este usuario en el sistema?')">
                                         Aceptar Usuario
                                     </a>
+                                    <a th:if="${!usuario.estadoAceptado}" 
+                                        th:href="@{/UsuarioOVI/rechazar/{id}(id=${usuario.idUsuario})}"
+                                        class="btn btn-sm btn-danger fw-bold"
+                                        onclick="return confirm('¿Estás seguro de que deseas rechazar a este usuario del sistema?')">
+                                            Denegar
+                                    </a>
                                 </td>
                             </tr>
                         </tbody>
