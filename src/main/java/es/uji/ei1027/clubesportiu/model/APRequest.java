@@ -10,6 +10,10 @@ public class APRequest {
     private String descripcion;
     private Estado estado;
     private Integer idSeleccion;
+    private String titulo;
+    private String zona;
+    private String preferencias;
+    private String horario;
 
     public APRequest() {
     }
@@ -62,6 +66,38 @@ public class APRequest {
         this.idSeleccion = idSeleccion;
     }
 
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getZona() {
+        return zona;
+    }
+
+    public void setZona(String zona) {
+        this.zona = zona;
+    }
+
+    public String getPreferencias() {
+        return preferencias;
+    }
+
+    public void setPreferencias(String preferencias) {
+        this.preferencias = preferencias;
+    }
+
+    public String getHorario() {
+        return horario;
+    }
+
+    public void setHorario(String horario) {
+        this.horario = horario;
+    }
+
     @Override
     public String toString() {
         return "APRequest{" +
@@ -70,6 +106,10 @@ public class APRequest {
                 ", fechaSolicitud=" + fechaSolicitud +
                 ", descripcion='" + descripcion + '\'' +
                 ", estado=" + estado +
+                ", titulo='" + titulo + '\'' +
+                ", zona='" + zona + '\'' +
+                ", preferencias='" + preferencias + '\'' +
+                ", horario='" + horario + '\'' +
                 '}';
     }
 }

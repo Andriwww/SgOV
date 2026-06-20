@@ -24,24 +24,44 @@
                 
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="text-teal fw-bold">Modificar Estado de la Petición</h2>
-                    <a th:href="@{/APRequest/list}" class="btn btn-outline-secondary">Volver a la lista</a>
+                    <a th:href="@{/APRequest/gestion/{id}(id=${apRequest.idRequest})}" class="btn btn-outline-secondary">Volver a gestión</a>
                 </div>
 
                 <div class="card shadow-sm border-0 rounded-3 p-4">
                     <form action="#" th:action="@{/APRequest/update}" th:object="${apRequest}" method="post">
             
                         <input type="hidden" th:field="*{idRequest}" />
+                        <input type="hidden" th:field="*{idUsuario}" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título / Asunto:</label>
+                            <input type="hidden" th:field="*{titulo}" />
+                            <input type="text" class="form-control bg-light" th:value="*{titulo}" disabled />
+                        </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">ID del Usuario:</label>
-                                <input type="hidden" th:field="*{idUsuario}" />
-                                <input type="text" class="form-control bg-light" th:value="*{idUsuario}" disabled />
-                            </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Fecha de Solicitud:</label>
                                 <input type="hidden" th:field="*{fechaSolicitud}" />
                                 <input type="text" class="form-control bg-light" th:value="*{fechaSolicitud}" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Zona:</label>
+                                <input type="hidden" th:field="*{zona}" />
+                                <input type="text" class="form-control bg-light" th:value="*{zona}" disabled />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Horario:</label>
+                                <input type="hidden" th:field="*{horario}" />
+                                <input type="text" class="form-control bg-light" th:value="*{horario}" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Preferencias:</label>
+                                <input type="hidden" th:field="*{preferencias}" />
+                                <input type="text" class="form-control bg-light" th:value="*{preferencias}" disabled />
                             </div>
                         </div>
 

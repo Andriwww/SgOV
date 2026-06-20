@@ -17,6 +17,10 @@ public class APRequestRowMapper implements RowMapper<APRequest> {
         request.setDescripcion(rs.getString("descripcion"));
         request.setEstado(Estado.valueOf(rs.getString("estado")));
         request.setIdSeleccion((Integer) rs.getObject("idseleccion"));
+        request.setTitulo(rs.getString("titulo"));
+        request.setZona(rs.getString("zona"));
+        request.setPreferencias(rs.getString("preferencias"));
+        request.setHorario(rs.getString("horario"));
         return request;
     }
 }

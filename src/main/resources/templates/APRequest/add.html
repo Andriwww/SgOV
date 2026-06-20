@@ -27,7 +27,7 @@
     <div class="text-center mb-5">
         <h1 class="display-5 fw-bold text-teal mb-3">Realizar Petición</h1>
         <p class="lead text-muted">
-            Indica tu zona, disponibilidad y preferencias
+            Los campos marcados con un asterisco * son obligatorios
         </p>
     </div>
 
@@ -41,30 +41,59 @@
                     <input type="hidden" th:field="*{idRequest}" />
                     <input type="hidden" th:field="*{idUsuario}" />
 
-                    <!-- SOLO DESCRIPCIÓN -->
                     <div class="mb-4">
-
-                        <label class="form-label fw-bold">
-                            Información de la solicitud
+                        <label class="form-label fw-bold text-secondary" for="titulo">
+                            Título o Asunto breve <span class="text-danger">*</span>
                         </label>
-                        
-                        <textarea th:field="*{descripcion}"
-                                  class="form-control form-control-lg"
-                                  rows="7"
-                                  placeholder="Escribe aquí:
-
-Zona: Castellón
-Disponibilidad: mañanas / tardes / fines de semana
-Preferencias: acompañamiento médico, estudios, etc.">
-                        </textarea>
-
+                        <input type="text" id="titulo" th:field="*{titulo}"
+                               class="form-control form-control-lg"
+                               placeholder="Ej: Acompañamiento a la universidad" required>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2">
-                        <a th:href="@{/UsuarioOVI/dashboard}" class="btn btn-light border">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-secondary" for="zona">
+                                Zona <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="zona" th:field="*{zona}"
+                                   class="form-control"
+                                   placeholder="Ej: Castellón Centro, Vila-real..." required>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-secondary" for="horario">
+                                Horario / Disponibilidad <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="horario" th:field="*{horario}"
+                                   class="form-control"
+                                   placeholder="Ej: L a V mañanas, Fines de semana..." required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary" for="preferencias">
+                            Preferencias <span class="text-danger"></span>
+                        </label>
+                        <input type="text" id="preferencias" th:field="*{preferencias}"
+                               class="form-control"
+                               placeholder="Ej: Carnet de conducir, conocimientos médicos..." >
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary" for="descripcion">
+                            Detalles adicionales (Descripción) <span class="text-danger"></span>
+                        </label>
+                        <textarea id="descripcion" th:field="*{descripcion}"
+                                  class="form-control"
+                                  rows="5"
+                                  placeholder="Describe aquí cualquier otro detalle importante..."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-5">
+                        <a th:href="@{/UsuarioOVI/dashboard}" class="btn btn-light border px-4">
                             Cancelar
                         </a>
-                        <button type="submit" class="btn btn-teal fw-bold">
+                        <button type="submit" class="btn btn-teal fw-bold px-4">
                             Enviar petición
                         </button>
                     </div>

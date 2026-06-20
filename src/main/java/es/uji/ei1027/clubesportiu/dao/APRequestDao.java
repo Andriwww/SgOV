@@ -28,10 +28,14 @@ public class APRequestDao {
     public void addAPRequest(APRequest request) {
 
     jdbcTemplate.update(
-        "INSERT INTO aprequest (idusuario, descripcion, estado) VALUES (?, ?, CAST(? AS estado))",
+    "INSERT INTO aprequest (idusuario, descripcion, estado, titulo, zona, preferencias, horario) VALUES (?, ?, CAST(? AS estado), ?, ?, ?, ?)",
         request.getIdUsuario(),
         request.getDescripcion(),
-        request.getEstado().name()
+        request.getEstado().name(),
+        request.getTitulo(),
+        request.getZona(),
+        request.getPreferencias(),
+        request.getHorario()
     );
 }
 
@@ -45,13 +49,17 @@ public class APRequestDao {
 
     public void updateAPRequest(APRequest request) {
         
-        String sql = "UPDATE aprequest SET idusuario=?, fechasolicitud=?, descripcion=?, estado=?::estado WHERE idrequest=?";
+        String sql = "UPDATE aprequest SET idusuario=?, fechasolicitud=?, descripcion=?, estado=?::estado, titulo=?, zona=?, preferencias=?, horario=? WHERE idrequest=?";
         
         jdbcTemplate.update(sql, 
             request.getIdUsuario(), 
             request.getFechaSolicitud(), 
             request.getDescripcion(), 
-            request.getEstado().name(), 
+            request.getEstado().name(),
+            request.getTitulo(),
+            request.getZona(),
+            request.getPreferencias(),
+            request.getHorario(),
             request.getIdRequest()
         );
     }

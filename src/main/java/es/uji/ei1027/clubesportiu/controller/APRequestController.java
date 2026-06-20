@@ -76,7 +76,7 @@ public class APRequestController {
                 }
             }
         }
-        
+
         model.addAttribute("requests", requests);
         model.addAttribute("rol", rol);
         model.addAttribute("nombresUsuarios", nombresUsuarios);
@@ -308,6 +308,26 @@ public class APRequestController {
         
         apRequestDao.updateAPRequest(apRequest);
         
-        return "redirect:/APRequest/list";
+        return "redirect:/APRequest/gestion/" + apRequest.getIdRequest();
+    }
+
+    @GetMapping("/gestion/{id}")
+    public String gestionarPeticion(@PathVariable("id") int id, Model model, HttpSession session) {
+        TecnicoOVI tecnico = (TecnicoOVI) session.getAttribute("tecnicoLogueado");
+        if (tecnico == null) {
+            return "redirect:/TecnicoOVI/login";
+        }
+
+        APRequest request = apRequestDao.getAPRequest(id);
+        if (request == null) {
+            return "redirect:/APRequest/list";
+        }
+        
+        String nombreUsuario = apRequestDao.getNombreUsuarioPorId(request.getIdUsuario());
+
+        model.addAttribute("request", request);
+        model.addAttribute("nombreUsuario", nombreUsuario);
+        
+        return "APRequest/gestion"; 
     }
 }
