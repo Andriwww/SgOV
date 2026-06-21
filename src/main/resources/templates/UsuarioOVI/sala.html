@@ -8,13 +8,11 @@
     <style>
         .chat-sidebar { height: calc(100vh - 160px); overflow-y: auto; }
         .chat-container { height: calc(100vh - 230px); overflow-y: auto; }
-        /* Mensajes enviados por MÍ (Usuario) -> Derecha y Verde/Teal */
-        .bubble-me { background-color: #008080; color: white; border-radius: 15px 15px 0px 15px; }
-        /* Mensajes enviados por el OTRO (Asistente) -> Izquierda y Gris */
-        .bubble-other { background-color: #f1f3f5; color: #212529; border-radius: 15px 15px 15px 0px; }
-        .chat-item-active { background-color: rgba(0, 128, 128, 0.1) !important; border-left: 4px solid #008080; }
-        .btn-teal { background-color: #008080; color: white; }
-        .btn-teal:hover { background-color: #006666; color: white; }
+        .bubble-me { background-color: #000000; color: white; border-radius: 15px 15px 0px 15px; }
+        .bubble-other { background-color: #000000; color: #212529; border-radius: 15px 15px 15px 0px; }
+        .chat-item-active { background-color: rgba(0, 128, 128, 0.1) !important; border-left: 4px solid #000000; }
+        .btn-teal { background-color: #000000; color: white; }
+        .btn-teal:hover { background-color: #000000; color: white; }
     </style>
 </head>
 
@@ -82,7 +80,6 @@
                         <div class="card-body chat-container p-4 bg-light" id="cajaMensajes">
                             <div th:each="msg : ${mensajes}" class="d-flex mb-3" 
                                  th:classappend="${msg.remitente == 'USUARIO'} ? 'justify-content-end' : 'justify-content-start'">
-                                
                                 <div class="p-3 shadow-sm" 
                                      th:classappend="${msg.remitente == 'USUARIO'} ? 'bubble-me' : 'bubble-other'" 
                                      style="max-width: 70%;">
@@ -94,7 +91,7 @@
                         
                         <div class="card-footer bg-white p-3 border-top">
                             <form th:action="@{/chat/usuario/enviar/{id}(id=${chatActual.idChat})}" method="post" class="d-flex gap-2">
-                                <input type="text" name="contenido" class="form-control rounded-3 py-2" placeholder="Escribe tu mensaje aquí..." required autocomplete="off" autofocus>
+                                <input type="text" name="contenido" class="form-control rounded-3 py-2" placeholder="Escribe tu mensaje aquí..." required autocomplete="off">
                                 <button type="submit" class="btn btn-teal fw-bold px-4 rounded-3">Enviar</button>
                             </form>
                         </div>
@@ -105,24 +102,5 @@
         </div>
     </main>
 
-    <script>
-        // Realizar scroll automático al fondo al cargar si existe la caja
-        var contenedor = document.getElementById("cajaMensajes");
-        if (contenedor) {
-            contenedor.scrollTop = contenedor.scrollHeight;
-        }
-
-        // Ejecutar bucle solo si hay un chat activo
-        var idChatActual = "[[${chatActual != null ? chatActual.idChat : 0}]]";
-        if (parseInt(idChatActual) > 0) {
-            setInterval(function() {
-                var inputMensaje = document.querySelector("input[name='contenido']");
-                // Solo refresca si el usuario no está escribiendo nada
-                if (!inputMensaje || inputMensaje.value.trim() === "") {
-                    window.location.reload();
-                }
-            }, 4000); // Cada 4 segundos para mayor agilidad
-        }
-    </script>
 </body>
 </html>

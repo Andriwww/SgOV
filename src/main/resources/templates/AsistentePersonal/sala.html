@@ -8,13 +8,11 @@
     <style>
         .chat-sidebar { height: calc(100vh - 160px); overflow-y: auto; }
         .chat-container { height: calc(100vh - 230px); overflow-y: auto; }
-        /* El color verde (teal) ahora es para el ASISTENTE */
-        .bubble-me { background-color: #008080; color: white; border-radius: 15px 15px 0px 15px; }
-        /* El color gris ahora es para el USUARIO */
+        .bubble-me { background-color: #000000; color: white; border-radius: 15px 15px 0px 15px; }
         .bubble-other { background-color: #f1f3f5; color: #212529; border-radius: 15px 15px 15px 0px; }
-        .chat-item-active { background-color: rgba(0, 128, 128, 0.1) !important; border-left: 4px solid #008080; }
-        .btn-teal { background-color: #008080; color: white; }
-        .btn-teal:hover { background-color: #006666; color: white; }
+        .chat-item-active { background-color: rgba(0, 128, 128, 0.1) !important; border-left: 4px solid #000000; }
+        .btn-teal { background-color: #000000; color: white; }
+        .btn-teal:hover { background-color: #000000; color: white; }
     </style>
 </head>
 
@@ -37,13 +35,14 @@
     <main class="container">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="height: calc(100vh - 120px);">
             <div class="row g-0 h-100">
-                
+
                 <div class="col-md-4 col-lg-3 border-end bg-white d-flex flex-column h-100">
                     <div class="p-3 border-bottom bg-light">
                         <h5 class="mb-0 fw-bold text-secondary">Salas de Usuarios</h5>
                     </div>
+
                     <div class="list-group list-group-flush chat-sidebar flex-grow-1">
-                        <a th:each="chat : ${chats}" 
+                        <a th:each="chat : ${chats}"
                            th:href="@{/chat/asistente/sala/{id}(id=${chat.idChat})}"
                            class="list-group-item list-group-item-action p-3 border-bottom"
                            th:classappend="${chatActual != null and chat.idChat == chatActual.idChat} ? 'chat-item-active' : ''">
@@ -53,7 +52,7 @@
                             </div>
                             <p class="mb-0 text-muted small text-truncate">Solicitud #<span th:text="${chat.idRequest}">0</span></p>
                         </a>
-                        
+
                         <div th:if="${#lists.isEmpty(chats)}" class="text-center p-4 text-muted small">
                             No tienes ninguna solicitud de chat asignada actualmente.
                         </div>
@@ -61,35 +60,35 @@
                 </div>
 
                 <div class="col-md-8 col-lg-9 d-flex flex-column h-100 bg-light">
-                    
-                    <div th:if="${chatActual == null || chatActual.idChat == 0}" class="card border-0 rounded-4 shadow-sm my-auto mx-auto text-center p-5 bg-white" style="max-width: 500px;">
+
+                    <div th:if="${chatActual == null || chatActual.idChat == 0}"
+                         class="card border-0 rounded-4 shadow-sm my-auto mx-auto text-center p-5 bg-white"
+                         style="max-width: 500px;">
                         <div class="display-1 text-muted mb-3">✉️</div>
                         <h3 class="fw-bold text-secondary">Bandeja de Consultas</h3>
                         <p class="text-muted">Por favor, selecciona a un usuario de tu lista lateral para revisar el historial de mensajería y coordinar vuestros servicios.</p>
                     </div>
 
                     <div th:if="${chatActual != null and chatActual.idChat != 0}" class="d-flex flex-column h-100 bg-white">
-                        
                         <div class="card-header bg-white border-0 py-3 border-bottom d-flex align-items-center">
                             <div>
                                 <h5 class="mb-0 fw-bold text-dark" th:text="${chatActual.nombreUsuario}">Nombre del Usuario</h5>
                                 <small class="text-muted">Gestión asociada a la Solicitud ID: #<span th:text="${chatActual.idRequest}">0</span></small>
                             </div>
                         </div>
-                        
-                        <div class="card-body chat-container p-4 bg-light" id="cajaMensajes">
-                            <div th:each="msg : ${mensajes}" class="d-flex mb-3" 
+
+                        <div class="card-body chat-container p-4 bg-light">
+                            <div th:each="msg : ${mensajes}" class="d-flex mb-3"
                                  th:classappend="${msg.remitente == 'ASISTENTE'} ? 'justify-content-end' : 'justify-content-start'">
-                                
-                                <div class="p-3 shadow-sm" 
-                                     th:classappend="${msg.remitente == 'ASISTENTE'} ? 'bubble-me' : 'bubble-other'" 
+                                <div class="p-3 shadow-sm"
+                                     th:classappend="${msg.remitente == 'ASISTENTE'} ? 'bubble-me' : 'bubble-other'"
                                      style="max-width: 70%;">
                                     <p class="mb-1" th:text="${msg.contenido}"></p>
                                     <small class="d-block text-end opacity-75" style="font-size: 0.7rem;" th:text="${#dates.format(msg.fechaEnvio, 'HH:mm')}"></small>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card-footer bg-white p-3 border-top">
                             <form th:action="@{/chat/asistente/enviar/{idChat}(idChat=${chatActual.idChat})}" method="post" class="d-flex gap-2">
                                 <input type="hidden" name="idRequest" th:value="${chatActual.idRequest}" />
@@ -104,24 +103,5 @@
         </div>
     </main>
 
-    <script>
-        // Realizar scroll automático al fondo al cargar si existe la caja
-        var contenedor = document.getElementById("cajaMensajes");
-        if (contenedor) {
-            contenedor.scrollTop = contenedor.scrollHeight;
-        }
-
-        // Ejecutar bucle solo si hay un chat activo
-        var idChatActual = "[[${chatActual != null ? chatActual.idChat : 0}]]";
-        if (parseInt(idChatActual) > 0) {
-            setInterval(function() {
-                var inputMensaje = document.querySelector("input[name='contenido']");
-                // Solo refresca si el asistente no está escribiendo una respuesta
-                if (!inputMensaje || inputMensaje.value.trim() === "") {
-                    window.location.reload();
-                }
-            }, 4000); // Cada 4 segundos
-        }
-    </script>
 </body>
 </html>
