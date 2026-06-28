@@ -31,4 +31,5 @@ public class RegistroContrato {
 
     public int getIdSeleccion() { return idSeleccion; }
     public void setIdSeleccion(int idSeleccion) { this.idSeleccion = idSeleccion; }
+
 }

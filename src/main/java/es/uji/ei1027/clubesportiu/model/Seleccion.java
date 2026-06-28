@@ -6,6 +6,8 @@ public class Seleccion {
     private int idSeleccion;
     private LocalDate fechaSeleccion;
     private Estado estado;
+    private int idUsuario;
+    private int idAsistente;
 
     public Seleccion() {
     }
@@ -32,6 +34,22 @@ public class Seleccion {
 
     public void setEstado(Estado estado) {
         this.estado = estado;
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public int getIdAsistente() {
+        return idAsistente;
+    }
+
+    public void setIdAsistente(int idAsistente) {
+        this.idAsistente = idAsistente;
     }
 
     @Override

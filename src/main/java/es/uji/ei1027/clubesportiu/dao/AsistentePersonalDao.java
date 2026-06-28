@@ -135,4 +135,50 @@ public class AsistentePersonalDao {
         );
         return (count != null) ? count : 0;
     }
+
+    public List<AsistentePersonal> getAsistentesPaginados(String buscar, int limit, int offset) {
+
+        String sql =
+            "SELECT * FROM AsistentePersonal " +
+            "WHERE estadoAceptado = true " +
+            "AND (LOWER(nombre) LIKE LOWER(?) " +
+            "OR LOWER(apellidos) LIKE LOWER(?) " +
+            "OR LOWER(email) LIKE LOWER(?)) " +
+            "ORDER BY nombre " +
+            "LIMIT ? OFFSET ?";
+
+        String filtro = "%" + buscar + "%";
+
+        return jdbcTemplate.query(
+                sql,
+                new AsistentePersonalRowMapper(),
+                filtro,
+                filtro,
+                filtro,
+                limit,
+                offset
+        );
+    }
+
+    public int countAsistentes(String buscar) {
+
+        String sql =
+            "SELECT COUNT(*) FROM AsistentePersonal " +
+            "WHERE estadoAceptado = true " +
+            "AND (LOWER(nombre) LIKE LOWER(?) " +
+            "OR LOWER(apellidos) LIKE LOWER(?) " +
+            "OR LOWER(email) LIKE LOWER(?))";
+
+        String filtro = "%" + buscar + "%";
+
+        Integer total = jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
+                filtro,
+                filtro,
+                filtro
+        );
+
+        return total == null ? 0 : total;
+    }
 }

@@ -1,7 +1,10 @@
 package es.uji.ei1027.clubesportiu.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,18 +14,22 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import jakarta.servlet.http.HttpSession;
 
 import es.uji.ei1027.clubesportiu.dao.APRequestDao;
 import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.dao.CandidatoDao;
 import es.uji.ei1027.clubesportiu.dao.MensajeChatDao;
+import es.uji.ei1027.clubesportiu.dao.RegistroContratoDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.model.Estado;
 import es.uji.ei1027.clubesportiu.model.MensajeChat;
 import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
+import es.uji.ei1027.clubesportiu.util.Paginacion;
 
 @Controller
 @RequestMapping("/APRequest")
@@ -31,8 +38,12 @@ public class APRequestController {
     private APRequestDao apRequestDao;
     private AsistentePersonalDao asistentePersonalDao;
     private CandidatoDao candidatoDao; 
+
     @Autowired
     private MensajeChatDao mensajeChatDao;
+
+    @Autowired
+    private RegistroContratoDao registroContratoDao;
 
     @Autowired
     public void setAPRequestDao(APRequestDao apRequestDao) {
@@ -50,37 +61,77 @@ public class APRequestController {
     }
 
     @RequestMapping("/list")
-    public String listAPRequests(HttpSession session, Model model) {
-        List<APRequest> requests = null;
-        String rol = "";
-        
+    public String listAPRequests(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String buscar,
+            HttpSession session,
+            Model model) {
+
+        Paginacion paginacion = new Paginacion();
+        paginacion.setPage(page);
+        paginacion.setBuscar(buscar);
+
+
+
+        List<APRequest> requests;
+        String rol;
+        int total;
+
         if (session.getAttribute("tecnicoLogueado") != null) {
-            requests = apRequestDao.getAPRequests();
+
             rol = "TECNICO";
+
+            total = apRequestDao.countAPRequests(buscar);
+
+            requests = apRequestDao.getAPRequestsPaginados(
+                    buscar,
+                    paginacion.getSize(),
+                    paginacion.getOffset());
+
         } else if (session.getAttribute("usuarioLogueado") != null) {
-            es.uji.ei1027.clubesportiu.model.UsuarioOVI usuario = 
-                (es.uji.ei1027.clubesportiu.model.UsuarioOVI) session.getAttribute("usuarioLogueado");
-            requests = apRequestDao.getAPRequestsByUsuario(usuario.getIdUsuario());
+
+            UsuarioOVI usuario =
+                    (UsuarioOVI) session.getAttribute("usuarioLogueado");
+
             rol = "USUARIO";
+
+            total = apRequestDao.countAPRequestsByUsuario(
+                    usuario.getIdUsuario(),
+                    buscar);
+
+            requests = apRequestDao.getAPRequestsByUsuarioPaginados(
+                    usuario.getIdUsuario(),
+                    buscar,
+                    paginacion.getSize(),
+                    paginacion.getOffset());
+
         } else {
             return "redirect:/";
         }
 
-        java.util.Map<Integer, String> nombresUsuarios = new java.util.HashMap<>();
+        int totalPages = (int) Math.ceil((double) total / paginacion.getSize());
 
-        if (requests != null) {
+        Map<Integer, String> nombresUsuarios = new HashMap<>();
+
+        if ("TECNICO".equals(rol)) {
             for (APRequest req : requests) {
-                if ("TECNICO".equals(rol) && req.getIdUsuario() != 0) {
-                    String nombreUser = apRequestDao.getNombreUsuarioPorId(req.getIdUsuario());
-                    nombresUsuarios.put(req.getIdUsuario(), nombreUser);
+                if (req.getIdUsuario() != 0) {
+                    nombresUsuarios.put(
+                            req.getIdUsuario(),
+                            apRequestDao.getNombreUsuarioPorId(req.getIdUsuario()));
                 }
             }
         }
 
         model.addAttribute("requests", requests);
         model.addAttribute("rol", rol);
+        model.addAttribute("buscar", buscar);
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("urlBase", "/APRequest/list");
         model.addAttribute("nombresUsuarios", nombresUsuarios);
-        
+        model.addAttribute("mostrarZona", false);
+
         return "APRequest/list";
     }
 
@@ -327,6 +378,7 @@ public class APRequestController {
 
         model.addAttribute("request", request);
         model.addAttribute("nombreUsuario", nombreUsuario);
+        model.addAttribute("existeContrato", registroContratoDao.existeContrato(id));
         
         return "APRequest/gestion"; 
     }

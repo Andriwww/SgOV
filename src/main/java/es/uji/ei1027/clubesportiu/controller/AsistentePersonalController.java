@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import es.uji.ei1027.clubesportiu.util.Paginacion;
 import es.uji.ei1027.clubesportiu.dao.AsistentePersonalDao;
 import es.uji.ei1027.clubesportiu.model.APRequest;
 import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
@@ -45,13 +47,38 @@ public class AsistentePersonalController {
 
     
     @RequestMapping("/list")
-    public String list(Model model) {
+    public String list(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String buscar,
+            @RequestParam(defaultValue = "") String zona,
+            Model model) {
 
-        model.addAttribute("asistentes",
-            asistentePersonalDao.getAsistentesPersonales());
+        Paginacion paginacion = new Paginacion();
+        paginacion.setPage(page);
+        paginacion.setBuscar(buscar);
 
-        model.addAttribute("numSolicitudes",
-            asistentePersonalDao.countAsistentesPendientes());
+        int total = asistentePersonalDao.countAsistentes(buscar);
+        int totalPages = (int) Math.ceil((double) total / paginacion.getSize());
+
+        model.addAttribute(
+                "asistentes",
+                asistentePersonalDao.getAsistentesPaginados(
+                        buscar,
+                        paginacion.getSize(),
+                        paginacion.getOffset()));
+
+        model.addAttribute("page", page);
+        model.addAttribute("buscar", buscar);
+        model.addAttribute("zona", zona);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("mostrarZona", true);
+
+        // ← AÑADE ESTA LÍNEA
+        model.addAttribute("urlBase", "/AsistentePersonal/list");
+
+        model.addAttribute(
+                "numSolicitudes",
+                asistentePersonalDao.countAsistentesPendientes());
 
         return "AsistentePersonal/list";
     }
@@ -362,17 +389,45 @@ public class AsistentePersonalController {
 
 
     @RequestMapping(value = "/contratos", method = RequestMethod.GET)
-    public String misContratos(HttpSession session, Model model) {
-        AsistentePersonal asistente = (AsistentePersonal) session.getAttribute("asistenteLogueado");
+    public String misContratos(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String buscar,
+            HttpSession session,
+            Model model) {
+
+        AsistentePersonal asistente =
+                (AsistentePersonal) session.getAttribute("asistenteLogueado");
+
         if (asistente == null) {
             return "redirect:/AsistentePersonal/login";
         }
 
+        Paginacion paginacion = new Paginacion();
+        paginacion.setPage(page);
+        paginacion.setBuscar(buscar);
+
+        int total = registroContratoDao.countContratosPorAsistente(
+                asistente.getIdAsistente(),
+                buscar);
+
+        int totalPages =
+                (int) Math.ceil((double) total / paginacion.getSize());
+
+        model.addAttribute(
+                "contratosAsistente",
+                registroContratoDao.getContratosPorAsistentePaginados(
+                        asistente.getIdAsistente(),
+                        buscar,
+                        paginacion.getSize(),
+                        paginacion.getOffset()));
+
         model.addAttribute("usuarioLogueado", asistente);
 
-        List<RegistroContrato> contratos = registroContratoDao.getContratosPorAsistente(asistente.getIdAsistente());
-        
-        model.addAttribute("contratosAsistente", contratos);
+        model.addAttribute("page", page);
+        model.addAttribute("buscar", buscar);
+        model.addAttribute("totalPages", totalPages);
+
+        model.addAttribute("urlBase", "/AsistentePersonal/contratos");
 
         return "AsistentePersonal/contratos";
     }

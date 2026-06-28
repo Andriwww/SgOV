@@ -14,6 +14,8 @@ public class SeleccionRowMapper implements RowMapper<Seleccion> {
         seleccion.setIdSeleccion(rs.getInt("idSeleccion"));
         seleccion.setFechaSeleccion(rs.getDate("fechaSeleccion").toLocalDate());
         seleccion.setEstado(Estado.valueOf(rs.getString("estado")));
+        seleccion.setIdUsuario(rs.getInt("idusuario"));
+        seleccion.setIdAsistente(rs.getInt("idasistente"));
         return seleccion;
     }
 }

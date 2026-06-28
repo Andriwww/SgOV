@@ -125,4 +125,95 @@ public class APRequestDao {
         String sql = "SELECT nombre FROM usuarioovi WHERE idusuario = ?";
         return jdbcTemplate.queryForObject(sql, String.class, idUsuario);
     }
+
+    public int countAPRequests(String buscar) {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM aprequest
+            WHERE LOWER(titulo) LIKE LOWER(?)
+            OR LOWER(descripcion) LIKE LOWER(?)
+            """;
+
+        String filtro = "%" + buscar + "%";
+
+        return jdbcTemplate.queryForObject(sql, Integer.class, filtro, filtro);
+    }
+
+    public List<APRequest> getAPRequestsPaginados(
+            String buscar,
+            int limit,
+            int offset) {
+
+        String sql = """
+            SELECT *
+            FROM aprequest
+            WHERE LOWER(titulo) LIKE LOWER(?)
+            OR LOWER(descripcion) LIKE LOWER(?)
+            ORDER BY idrequest DESC
+            LIMIT ? OFFSET ?
+            """;
+
+        String filtro = "%" + buscar + "%";
+
+        return jdbcTemplate.query(
+                sql,
+                new APRequestRowMapper(),
+                filtro,
+                filtro,
+                limit,
+                offset);
+    }
+
+    public int countAPRequestsByUsuario(int idUsuario, String buscar) {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM aprequest
+            WHERE idusuario = ?
+            AND (
+                    LOWER(titulo) LIKE LOWER(?)
+                OR LOWER(descripcion) LIKE LOWER(?)
+            )
+            """;
+
+        String filtro = "%" + buscar + "%";
+
+        return jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
+                idUsuario,
+                filtro,
+                filtro);
+    }
+
+    public List<APRequest> getAPRequestsByUsuarioPaginados(
+            int idUsuario,
+            String buscar,
+            int limit,
+            int offset) {
+
+        String sql = """
+            SELECT *
+            FROM aprequest
+            WHERE idusuario = ?
+            AND (
+                    LOWER(titulo) LIKE LOWER(?)
+                OR LOWER(descripcion) LIKE LOWER(?)
+            )
+            ORDER BY idrequest DESC
+            LIMIT ? OFFSET ?
+            """;
+
+        String filtro = "%" + buscar + "%";
+
+        return jdbcTemplate.query(
+                sql,
+                new APRequestRowMapper(),
+                idUsuario,
+                filtro,
+                filtro,
+                limit,
+                offset);
+    }
 }

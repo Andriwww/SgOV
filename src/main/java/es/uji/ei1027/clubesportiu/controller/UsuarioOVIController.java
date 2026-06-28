@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import es.uji.ei1027.clubesportiu.dao.RegistroContratoDao;
 import es.uji.ei1027.clubesportiu.dao.UsuarioOVIDao;
@@ -18,6 +19,7 @@ import es.uji.ei1027.clubesportiu.model.AsistentePersonal;
 import es.uji.ei1027.clubesportiu.model.TecnicoOVI;
 import es.uji.ei1027.clubesportiu.model.UserDetails;
 import es.uji.ei1027.clubesportiu.model.UsuarioOVI;
+import es.uji.ei1027.clubesportiu.util.Paginacion;
 import es.uji.ei1027.clubesportiu.validator.UsuarioOVIValidator;
 import jakarta.servlet.http.HttpSession;
 
@@ -40,8 +42,28 @@ public class UsuarioOVIController {
     }
 
     @RequestMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("usuarios", usuarioOVIDao.getUsuariosOVI());
+    public String list(
+            @RequestParam(defaultValue = "") String buscar,
+            @RequestParam(defaultValue = "1") int page,
+            Model model) {
+
+        int pageSize = 6;
+
+        model.addAttribute(
+                "usuarios",
+                usuarioOVIDao.getUsuariosPaginados(
+                        buscar,
+                        pageSize,
+                        (page - 1) * pageSize));
+
+        int total =
+                usuarioOVIDao.countUsuarios(buscar);
+
+        model.addAttribute("page", page);
+        model.addAttribute("buscar", buscar);
+        model.addAttribute("totalPages",
+                (int) Math.ceil((double) total / pageSize));
+
         return "UsuarioOVI/list";
     }
 
@@ -262,15 +284,43 @@ public class UsuarioOVIController {
     }
 
     @GetMapping("/contratos")
-    public String misContratos(HttpSession session, Model model) {
+    public String misContratos(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String buscar,
+            HttpSession session,
+            Model model) {
+
         UsuarioOVI usuario = (UsuarioOVI) session.getAttribute("usuarioLogueado");
+
         if (usuario == null) {
             return "redirect:/UsuarioOVI/login";
         }
 
-        model.addAttribute("contratos", registroContratoDao.getContratosPorUsuario(usuario.getIdUsuario()));
+        Paginacion paginacion = new Paginacion();
+        paginacion.setPage(page);
+        paginacion.setBuscar(buscar);
+
+        int total = registroContratoDao.countContratosPorUsuario(
+                usuario.getIdUsuario(),
+                buscar);
+
+        model.addAttribute(
+                "contratos",
+                registroContratoDao.getContratosPorUsuarioPaginados(
+                        usuario.getIdUsuario(),
+                        buscar,
+                        paginacion.getSize(),
+                        paginacion.getOffset()));
+
         model.addAttribute("nombreUsuario", usuario.getNombre());
-        
+
+        model.addAttribute("page", page);
+        model.addAttribute("buscar", buscar);
+        model.addAttribute("totalPages",
+                (int) Math.ceil((double) total / paginacion.getSize()));
+
+        model.addAttribute("mostrarZona", false);
+
         return "UsuarioOVI/contratos";
     }
 }

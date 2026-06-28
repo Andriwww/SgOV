@@ -81,4 +81,52 @@ public class UsuarioOVIDao {
             return null;
         }
     }
+
+    public List<UsuarioOVI> getUsuariosPaginados(String buscar,
+                                             int limit,
+                                             int offset) {
+
+        String filtro = "%" + buscar + "%";
+
+        return jdbcTemplate.query(
+            """
+            SELECT *
+            FROM usuarioovi
+            WHERE
+                LOWER(nombre) LIKE LOWER(?)
+                OR LOWER(apellidos) LIKE LOWER(?)
+                OR LOWER(email) LIKE LOWER(?)
+            ORDER BY idusuario
+            LIMIT ? OFFSET ?
+            """,
+            new UsuarioOVIRowMapper(),
+            filtro,
+            filtro,
+            filtro,
+            limit,
+            offset
+        );
+    }
+
+    public int countUsuarios(String buscar) {
+
+        String filtro = "%" + buscar + "%";
+
+        Integer total = jdbcTemplate.queryForObject(
+            """
+            SELECT COUNT(*)
+            FROM usuarioovi
+            WHERE
+                LOWER(nombre) LIKE LOWER(?)
+                OR LOWER(apellidos) LIKE LOWER(?)
+                OR LOWER(email) LIKE LOWER(?)
+            """,
+            Integer.class,
+            filtro,
+            filtro,
+            filtro
+        );
+
+        return total == null ? 0 : total;
+    }
 }
